@@ -59,6 +59,30 @@ Other columns are detailed in tabular form below. Notes:
 - modelled data is presented with confidence intervals:
   - `<XXX>_min` : denotes the lower bound of a 95% confidence interval (0.025% band);
   - `<XXX>_max` : denotes the upper bound of a 95% confidence interval (0.975% band);
+
+| Column name                       | source   | temporality   | Confidence Band | Description                   |
+|-----------------------------------|----------|---------------|-----------------|-------------------------------|
+| `"estimated_deaths_forecast"`     | forecast | daily         | 50%             | deaths of COVID-19.           |
+| `"estimated_deaths_forecast_min"` | forecast | daily         | 0.025%          | deaths of COVID-19.           |
+| `"estimated_deaths_forecast_max"` | forecast | daily         | 0.975%          | deaths of COVID-19.           |
+| `"rt"`                            | Inferred | instantaneous | 50%             | R_t total reproduction number |
+| `"rt_min"`                        | Inferred | instantaneous | 0.025%          | R_t total reproduction number |
+| `"rt_max"`                        | Inferred | instantaneous | 0.975%          | R_t total reproduction number |
+
+
+#### `-forecast-data.csv` - model forecast time series
+
+- "" : index
+- `"time"` : Date in format `yyyy-mm-dd`.
+- `"country"` : The geographical **region** of the data, to find the country crossreference with `<case name>-inputs-active_regions.csv`.
+- `"region"` : Geographical region in country.
+
+Other columns are detailed in tabular form below. Notes:
+
+- `<XXX>_c` : denotes a quantity cumulated since the start of the local epidemic;
+- modelled data is presented with confidence intervals:
+  - `<XXX>_min` : denotes the lower bound of a 95% confidence interval (0.025% band);
+  - `<XXX>_max` : denotes the upper bound of a 95% confidence interval (0.975% band);
   - `<XXX>_min2` : denotes the lower bound of a 50% confidence interval (0.25% band);
   - `<XXX>_max2` : denotes the upper bound of a 50% confidence interval (0.75% band);
 
@@ -89,8 +113,6 @@ Other columns are detailed in tabular form below. Notes:
 | `"rt_max"`             | Inferred | instantaneous | 0.975%          | R_t total reproduction number |
 | `"rt_min2"`            | Inferred | instantaneous | 0.25%           | R_t total reproduction number |
 | `"rt_max2"`            | Inferred | instantaneous | 0.75%           | R_t total reproduction number |
-
-#### `-forecast-data.csv` - model forecast time series
 
 ## Using this data
 
