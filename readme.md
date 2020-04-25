@@ -26,6 +26,19 @@ This repository is also available on [Kaggle](https://www.kaggle.com/mrpayoto/co
 - Data (all `.csv` and `.png` files) in this repository are licensed under the [CC-BY-4.0 license](LICENSE-data).
 - Code in this repository (all files except `.csv` and `.png`) in this repository are licensed under the [MIT License](LICENSE-code).
 
+## Adding to the data
+
+- Fork this repository
+- Clone this repository
+- Install the git hooks by running:
+
+  
+  .githooks/copy-hooks.sh
+
+- Add the content of the `payoto:covid19model/results/` folder corresponding to successful `--fullrun` executions.
+- Do a PR to add to this repository.
+
+
 ## Structure of data
 
 - Data is stored in the `runs/` folder

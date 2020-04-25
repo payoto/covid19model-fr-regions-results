@@ -1,4 +1,4 @@
 #!/bin/bash
-
-./get-run-stats.sh > run-manifest.csv
-./generate-commit-msg.sh > run-manifest-short.csv
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+./get-run-stats.sh > ${DIR}/run-manifest.csv
+./generate-commit-msg.sh > ${DIR}/run-manifest-short.csv

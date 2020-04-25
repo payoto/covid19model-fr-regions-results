@@ -1,0 +1,18 @@
+#!/bin/sh
+#
+# This hook diffs the short run manifest and puts it into the commit message, showing 
+# what data has been added. (Follows the git hook sample)
+
+COMMIT_MSG_FILE=$1
+COMMIT_SOURCE=$2
+SHA1=$3
+
+case "$COMMIT_SOURCE,$SHA1" in
+ ,|template,)
+   ./generate-manifest.sh
+   git add run-manifest-short.csv run-manifest.csv
+   /usr/bin/perl -i.bak -pe '
+      print "\n" . `git diff HEAD --no-ext-diff --unified=0 --exit-code -a --no-prefix --ignore-space-at-eol run-manifest-short.csv | egrep "^.\./runs" | sed "s/^\(.\)/ \1 /"`
+	 if /^#/ && $first++ == 0' "$COMMIT_MSG_FILE" ;;
+ *) ;;
+esac
