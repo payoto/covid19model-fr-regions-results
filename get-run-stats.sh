@@ -5,12 +5,14 @@
 # Optionally taje a command line argument which is a pattern identifying specific
 # runs.
 
-echo "folder , last available data, number of countries , number of zones , countries , modelling zones , "
+echo "folder , version, last available data, number of countries , number of zones , countries , modelling zones , "
 for foo in `find ./runs -maxdepth 1 -type d -name "*fullrun*${1}*"`
 do
 	echo -n "$foo , "
 	forecastfile=`find $foo -name "*forecast*.csv"`
 	activeregfile=`find $foo -name "*active_regions*.csv"`
+	versionfile=`find $foo -name "*model-version.dat"`
+	awk '{printf "%s, ", $0}' $versionfile
 	grep '"1"' $forecastfile | awk -F "," '{printf "%s , ", $2}'
 	countries=`awk -F "," 'NR!=1 {printf "%s\n", $3}' ${activeregfile} | sort | uniq`
 	regions=`awk -F "," 'NR!=1 {printf "%s\n", $2}' ${activeregfile} | sort | uniq`
@@ -21,4 +23,4 @@ do
 	echo -n ", "
 	echo $regions | sed 's/" "/"\n"/g' | awk '{printf "%s; ", $0}'
 	echo ", "
-done | sort -k 1 | sort -k 3
+done | sort -k 1 | sort -k 4

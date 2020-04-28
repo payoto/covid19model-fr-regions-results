@@ -1,16 +1,16 @@
-folder  ,  last available data ,  number of countries  ,  number of zones  
-./runs/base-fullrun-20200423T024310-3636909  ,  2020-03-24  ,  1  ,  15 
-./runs/base-fullrun-20200423T191520-3638433  ,  2020-03-24  ,  1  ,  15 
-./runs/base-fullrun-20200423T193320-3638456  ,  2020-03-24  ,  13  ,  27 
-./runs/base-fullrun-20200424T082058-3641029  ,  2020-04-01  ,  1  ,  17 
-./runs/base-fullrun-20200423T193324-3638456  ,  2020-04-01  ,  14  ,  30 
-./runs/base-fullrun-20200424T082105-3641029  ,  2020-04-05  ,  1  ,  17 
-./runs/base-fullrun-20200424T082116-3641029  ,  2020-04-10  ,  1  ,  17 
-./runs/base-fullrun-20200415T200000-1366540  ,  2020-04-13  ,  1  ,  16 
-./runs/base-fullrun-20200416T224705-844325  ,  2020-04-15  ,  14  ,  29 
-./runs/base-fullrun-20200418T003711-932055  ,  2020-04-16  ,  14  ,  14 
-./runs/base-fullrun-20200424T082126-3641029  ,  2020-04-18  ,  1  ,  17 
-./runs/base-fullrun-20200419T095119-660815  ,  2020-04-18  ,  14  ,  30 
-./runs/base-fullrun-20200424T082137-3641029  ,  2020-04-20  ,  1  ,  17 
-./runs/base-fullrun-20200420T231705-568055  ,  2020-04-20  ,  14  ,  30 
-./runs/base-fullrun-20200424T082148-3641029  ,  2020-04-22  ,  1  ,  17 
+folder  ,  version ,  last available data ,  number of countries  ,  number of zones  
+./runs/base-fullrun-20200423T024310-3636909  ,  v2 ,  2020-03-24  ,  1  ,  15 
+./runs/base-fullrun-20200423T191520-3638433  ,  v2 ,  2020-03-24  ,  1  ,  15 
+./runs/base-fullrun-20200423T193320-3638456  ,  v2 ,  2020-03-24  ,  13  ,  27 
+./runs/base-fullrun-20200424T082058-3641029  ,  v2 ,  2020-04-01  ,  1  ,  17 
+./runs/base-fullrun-20200423T193324-3638456  ,  v2 ,  2020-04-01  ,  14  ,  30 
+./runs/base-fullrun-20200424T082105-3641029  ,  v2 ,  2020-04-05  ,  1  ,  17 
+./runs/base-fullrun-20200424T082116-3641029  ,  v2 ,  2020-04-10  ,  1  ,  17 
+./runs/base-fullrun-20200415T200000-1366540  ,  v2 ,  2020-04-13  ,  1  ,  16 
+./runs/base-fullrun-20200416T224705-844325  ,  v2 ,  2020-04-15  ,  14  ,  29 
+./runs/base-fullrun-20200418T003711-932055  ,  v2 ,  2020-04-16  ,  14  ,  14 
+./runs/base-fullrun-20200424T082126-3641029  ,  v2 ,  2020-04-18  ,  1  ,  17 
+./runs/base-fullrun-20200419T095119-660815  ,  v2 ,  2020-04-18  ,  14  ,  30 
+./runs/base-fullrun-20200424T082137-3641029  ,  v2 ,  2020-04-20  ,  1  ,  17 
+./runs/base-fullrun-20200420T231705-568055  ,  v2 ,  2020-04-20  ,  14  ,  30 
+./runs/base-fullrun-20200424T082148-3641029  ,  v2 ,  2020-04-22  ,  1  ,  17 
