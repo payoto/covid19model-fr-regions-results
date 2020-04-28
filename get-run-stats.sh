@@ -9,11 +9,11 @@ echo "folder , version, last available data, number of countries , number of zon
 for foo in `find ./runs -maxdepth 1 -type d -name "*fullrun*${1}*"`
 do
 	echo -n "$foo , "
-	forecastfile=`find $foo -name "*forecast*.csv"`
+	forecastfile=`find $foo -name "*forecast*.csv" -not -name "*all-forecast*"`
 	activeregfile=`find $foo -name "*active_regions*.csv"`
 	versionfile=`find $foo -name "*model-version.dat"`
 	awk '{printf "%s, ", $0}' $versionfile
-	grep '"1"' $forecastfile | awk -F "," '{printf "%s , ", $2}'
+	head -n 3 $forecastfile | grep '"1"' | awk -F "," '{printf "%s , ", $2}'
 	countries=`awk -F "," 'NR!=1 {printf "%s\n", $3}' ${activeregfile} | sort | uniq`
 	regions=`awk -F "," 'NR!=1 {printf "%s\n", $2}' ${activeregfile} | sort | uniq`
 	num_countries=`echo $countries | sed 's/" "/"\n"/g' | wc -l`
