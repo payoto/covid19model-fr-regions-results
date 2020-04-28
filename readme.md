@@ -26,18 +26,24 @@ This repository is also available on [Kaggle](https://www.kaggle.com/mrpayoto/co
 - Data (all `.csv` and `.png` files) in this repository are licensed under the [CC-BY-4.0 license](LICENSE-data).
 - Code in this repository (all files except `.csv` and `.png`) in this repository are licensed under the [MIT License](LICENSE-code).
 
+## Using this data (in development)
+
+Analysis of the data is facilitated by an example jupyter notebook which
+shows usage of the `model_analysis` python package which is under development.
+
+See the [`data_load` notebook](data_load.ipynb) or the
+[`model_analysis` package](model_analysis/) for more info.
+
 ## Adding to the data
 
 - Fork this repository
 - Clone this repository
 - Install the git hooks by running:
 
-  
   .githooks/copy-hooks.sh
 
 - Add the content of the `payoto:covid19model/results/` folder corresponding to successful `--fullrun` executions.
 - Do a PR to add to this repository.
-
 
 ## Structure of data
 
@@ -127,6 +133,5 @@ Other columns are detailed in tabular form below. Notes:
 | `"rt_min2"`            | Inferred | instantaneous | 0.25%           | R_t total reproduction number |
 | `"rt_max2"`            | Inferred | instantaneous | 0.75%           | R_t total reproduction number |
 
-## Using this data
 
 ## Example dataset and visualisation
