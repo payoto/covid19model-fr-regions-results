@@ -35,9 +35,11 @@ def plot_forecast_country(forecast_df, country, country_label=None, **kwargs):
     col_active = [
         col for col in forecast_df.columns if 'estimated_deaths' in col
     ]
+    forecast_df = enable_time_series_plot(forecast_df)
+    
     axis_est_deaths = forecast_df.loc[
         forecast_df["country"] == country
-    ].plot(x="time", y=col_active, rot=45, **kwargs)
+    ].plot(x="date", y=col_active,  **kwargs)
 
     axis_est_deaths.set_ylabel("Forecasted daily deaths")
     # Formatting of the confidence interval lines to be dashed
@@ -48,9 +50,23 @@ def plot_forecast_country(forecast_df, country, country_label=None, **kwargs):
     axis_est_deaths.legend(handles=axis_est_deaths.get_lines())
     return axis_est_deaths
 
+def enable_time_series_plot(
+    in_df, timein_field='time', time_out='date', date_format="%Y-%m-%d"):
+    if time_out not in in_df.columns:
+        in_df[time_out] = pd.to_datetime(
+            in_df[timein_field],
+            format=date_format
+        )
+    return in_df
 
 def plot_forecast_countries(
-    forecast_df, country_list=None, color_cyle=None, **kwargs):
+    forecast_df, 
+    country_list=None,
+    color_cyle=None,
+    max_date=None,
+    min_date=None,
+    **kwargs
+):
 
     if country_list is None:
         country_list = forecast_df['country'].unique()
@@ -72,7 +88,14 @@ def plot_forecast_countries(
         # plot the country specific forecast
         axout = plot_forecast_country(forecast_df, country, **kwargs)
     
+    # Tailor axis limits
+    x_min, x_max = pd.to_datetime(axout.get_xlim(), unit='D')
+    if not (max_date is None):
+        axout.set_xlim(right=min(x_max, pd.to_datetime(max_date)))
+    if not (min_date is None):
+        axout.set_xlim(left=max(x_min, pd.to_datetime(min_date)))
     # Select only mean lines to appear in legend
     line_legend = [l for l in axout.get_lines() if l.get_label() in country_list]
     axout.legend(handles=line_legend)
+    
     return axout
