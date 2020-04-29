@@ -1,7 +1,12 @@
 import pandas as pd
 from matplotlib import pyplot as plt
 
-def plot_forecast_country(forecast_df, country, country_label=None, **kwargs):
+def plot_forecast_country(
+    forecast_df,
+    country,
+    country_label=None,
+    **kwargs
+):
     """ Plots the forecasted daily deaths with the 95% confidence interval.
 
     Arguments:
@@ -13,8 +18,61 @@ def plot_forecast_country(forecast_df, country, country_label=None, **kwargs):
         color (str): A color hex string
         ax (plt.Axes) : An axis 
     """
+    # Select the active columns
+    active_columns, plot_quantity, date_label =\
+        forecast_plot_specifiers(forecast_df)
+    
+    if country_label is None:
+        country_label = f"{country} ({date_label})"
+    
+    print(f"Plotting forecast for {country_label}")
+    return plot_timeseries_confidence_interval_country(
+        forecast_df,
+        active_columns, 
+        plot_quantity, # y label of the plot
+        country,
+        country_label,
+        **kwargs
+    )
+
+def forecast_plot_specifiers(forecast_df):
+    active_columns = [
+        col for col in forecast_df.columns if 'estimated_deaths' in col
+    ]
+    plot_quantity = "Forecasted daily deaths"
+    date_label = min(forecast_df["time"])
+    return (active_columns, plot_quantity, date_label)
+
+def plot_timeseries_confidence_interval_country(
+    forecast_df,
+    active_columns,
+    plot_quantity, # y label of the plot
+    country,
+    country_label=None,
+    **kwargs
+):
+    """ Plots the time series of a confidence interval.
+
+    Arguments:
+        forecast_df (pd.Dataframe) : a data frame whic results from loading
+        <run-name>-forecast-data.csv
+        country (string) : a string corresponding to a country in the dataframe
+        active_columns (list of string) : List of column names in the dataframe
+            of size  specifying mean, and bounds of the confidence interval.
+        plot_quantity (string) : A string to use as Y-label
+
+    kwargs are passed to `pd.Dataframe.plot()`:
+        color (str): A color hex string
+        ax (plt.Axes) : An axis 
+    """
     if country_label is None:
         country_label = country
+
+    if len(active_columns)!=3:
+        raise AttributeError(
+            "A confidence interval must specify 3 columns: mean, and, lower "
+            + "and upper bounds."
+        )
 
     if 'label' not in kwargs:
         upper_ci_mark = '_upper_CI95'
@@ -31,29 +89,52 @@ def plot_forecast_country(forecast_df, country, country_label=None, **kwargs):
         AttributeError(
             "Label passed to `plot_forecast_country` should be of length 3")
 
-    # Select the active columns then plot the active rows.
-    col_active = [
-        col for col in forecast_df.columns if 'estimated_deaths' in col
-    ]
-    forecast_df = enable_time_series_plot(forecast_df)
-    
+    # Compute the date field which is used as the x-axis
+    forecast_df = enable_time_series_plot(
+        forecast_df,
+        timeseries_field_out='date'
+    )
+
+    if 'ax' in kwargs:
+        ax_plot = kwargs['ax']
+    else:
+        ax_plot = plt
+
+    color_arg = {}
+    if 'color' in kwargs:
+        color_arg['color'] = kwargs['color']
+
+    line_color, = ax_plot.plot(forecast_df["date"].iloc[1],
+        forecast_df[active_columns[0]].iloc[1],
+        **color_arg
+    )
+    kwargs['color'] = line_color.get_color()
+    line_color.remove()
+
     axis_est_deaths = forecast_df.loc[
         forecast_df["country"] == country
-    ].plot(x="date", y=col_active,  **kwargs)
-
-    axis_est_deaths.set_ylabel("Forecasted daily deaths")
+    ].plot(x="date", y=active_columns,  **kwargs)
+    axis_est_deaths.set_ylabel(plot_quantity)
     # Formatting of the confidence interval lines to be dashed
     for line in axis_est_deaths.get_lines():
         if lower_ci_mark in line.get_label()\
             or upper_ci_mark in line.get_label():
             line.set_linestyle('--')
     axis_est_deaths.legend(handles=axis_est_deaths.get_lines())
-    return axis_est_deaths
+    return axis_est_deaths, country_label
 
 def enable_time_series_plot(
-    in_df, timein_field='time', time_out='date', date_format="%Y-%m-%d"):
-    if time_out not in in_df.columns:
-        in_df[time_out] = pd.to_datetime(
+    in_df, 
+    timein_field='time', 
+    timeseries_field_out='date', 
+    date_format="%Y-%m-%d",
+    ):
+    """
+    Small tool to add a field to a dataframe which can be used for time series
+    plotting
+    """
+    if timeseries_field_out not in in_df.columns:
+        in_df[timeseries_field_out] = pd.to_datetime(
             in_df[timein_field],
             format=date_format
         )
@@ -62,31 +143,29 @@ def enable_time_series_plot(
 def plot_forecast_countries(
     forecast_df, 
     country_list=None,
-    color_cyle=None,
+    color_cyle=[],
     max_date=None,
     min_date=None,
+    ax=None,
     **kwargs
 ):
 
     if country_list is None:
         country_list = forecast_df['country'].unique()
-    if color_cyle is None:
-        color_cyle = plt.rcParams['axes.prop_cycle']
-    # Which properties of the cycler are not already specified in kwargs?
-    active_cycle = {}
-    for prop in color_cyle.by_key():
-        active_cycle[prop] = not (prop in kwargs)
+    
+    if ax is None:
+        fig, ax = plt.subplots()
+    try:
+        label_list = [t.get_text() for t in ax.get_legend().texts]
+    except AttributeError as identifier:
+        label_list = []
 
-    if 'ax' not in kwargs:
-        fig, kwargs['ax'] = plt.subplots()
-
-    for country, properties in zip(country_list, color_cyle):
-        # Cycle a plot property by passing it to kwargs if it was not overriden
-        for prop in active_cycle:
-            if active_cycle[prop]:
-                kwargs[prop] = properties[prop]
+    for country in country_list:
         # plot the country specific forecast
-        axout = plot_forecast_country(forecast_df, country, **kwargs)
+        axout, main_label = plot_forecast_country(
+            forecast_df, country, 
+            ax=ax, **kwargs)
+        label_list.append(main_label)
     
     # Tailor axis limits
     x_min, x_max = pd.to_datetime(axout.get_xlim(), unit='D')
@@ -95,7 +174,7 @@ def plot_forecast_countries(
     if not (min_date is None):
         axout.set_xlim(left=max(x_min, pd.to_datetime(min_date)))
     # Select only mean lines to appear in legend
-    line_legend = [l for l in axout.get_lines() if l.get_label() in country_list]
+    line_legend = [l for l in axout.get_lines() if l.get_label() in label_list]
     axout.legend(handles=line_legend)
     
     return axout
