@@ -51,7 +51,7 @@ class Model_Folder(object):
     
     default_files_to_load = {
         'interventions': 'base-intervention',
-        'modeling': 'base-plot',
+        'modelling': 'base-plot',
         'forecasting': 'forecast-data',
         'ifr': 'inputs-active_regions_ifr',
         'reprocution': 'final-Rt',

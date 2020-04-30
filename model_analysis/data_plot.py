@@ -1,9 +1,22 @@
 import pandas as pd
 from matplotlib import pyplot as plt
 
+# Collect the error behaviour of pandas when plotting an empty dataframe
+error_pd_empty_plot = Exception()
+try:
+    pd.DataFrame().plot()
+except Exception as e:
+    error_pd_empty_plot = e
+type(error_pd_empty_plot)
+
+confidence_interval_format = {
+    "linestyle": '--'
+}
+
 def plot_forecast_country(
     forecast_df,
     country,
+    *,
     country_label=None,
     **kwargs
 ):
@@ -19,36 +32,74 @@ def plot_forecast_country(
         ax (plt.Axes) : An axis 
     """
     # Select the active columns
-    active_columns, plot_quantity, date_label =\
-        forecast_plot_specifiers(forecast_df)
-    
-    if country_label is None:
-        country_label = f"{country} ({date_label})"
-    
-    print(f"Plotting forecast for {country_label}")
-    return plot_timeseries_confidence_interval_country(
-        forecast_df,
-        active_columns, 
-        plot_quantity, # y label of the plot
-        country,
-        country_label,
-        **kwargs
-    )
-
-def forecast_plot_specifiers(forecast_df):
     active_columns = [
         col for col in forecast_df.columns if 'estimated_deaths' in col
     ]
     plot_quantity = "Forecasted daily deaths"
     date_label = min(forecast_df["time"])
-    return (active_columns, plot_quantity, date_label)
+    
+    if country_label is None:
+        country_label = f"{country} (forecast from {date_label})"
+    country_field = "country"
+    print(f"Plotting forecast for {country_label}")
+    return plot_timeseries_confidence_interval_country(
+        forecast_df,
+        active_columns,
+        plot_quantity, # y label of the plot
+        country,
+        country_label=country_label,
+        country_field=country_field,
+        **kwargs
+    )
+
+def plot_model_country(
+    model_df,
+    country,
+    *,
+    country_label=None,
+    **kwargs
+):
+    """ Plots the forecasted daily deaths with the 95% confidence interval.
+
+    Arguments:
+        model_df (pd.Dataframe) : a data frame whic results from loading
+        <run-name>-forecast-data.csv
+        country (str) : a string corresponding to a country in the 
+
+    kwargs are passed to `pd.Dataframe.plot()`:
+        color (str): A color hex string
+        ax (plt.Axes) : An axis 
+    """
+    # Select the active columns
+    active_columns = [
+        "estimated_deaths", "death_min", "death_max",
+    ]
+    plot_quantity = "Modelled daily deaths"
+    date_label = max(model_df["time"])
+    country_field="region"
+    if country_label is None:
+        country_label = f"{country} (model to {date_label})"
+    
+    print(f"Plotting model for {country_label}")
+    return plot_timeseries_confidence_interval_country(
+        model_df,
+        active_columns, 
+        plot_quantity, # y label of the plot
+        country,
+        country_label=country_label,
+        country_field=country_field,
+        **kwargs
+    )
+    
 
 def plot_timeseries_confidence_interval_country(
     forecast_df,
     active_columns,
     plot_quantity, # y label of the plot
     country,
+    *,
     country_label=None,
+    country_field="country",
     **kwargs
 ):
     """ Plots the time series of a confidence interval.
@@ -110,16 +161,31 @@ def plot_timeseries_confidence_interval_country(
     )
     kwargs['color'] = line_color.get_color()
     line_color.remove()
-
-    axis_est_deaths = forecast_df.loc[
-        forecast_df["country"] == country
-    ].plot(x="date", y=active_columns,  **kwargs)
+    try:
+        # plot time series quantity
+        axis_est_deaths = forecast_df.loc[
+            forecast_df[country_field] == country
+        ].plot(x="date", y=active_columns,  **kwargs)
+    except type(error_pd_empty_plot) as errid:
+        # If it is the error raised by pandas for an empty plot warn the user 
+        # and early return otherwise raise the error
+        if errid.args == error_pd_empty_plot.args:
+            print(
+                f"WARNING: Data for country {country_label} "
+                + "not available in dataframe. skipping plot."
+            )
+            return ax_plot, country_label
+        else:
+            raise errid
+    
     axis_est_deaths.set_ylabel(plot_quantity)
     # Formatting of the confidence interval lines to be dashed
     for line in axis_est_deaths.get_lines():
         if lower_ci_mark in line.get_label()\
             or upper_ci_mark in line.get_label():
-            line.set_linestyle('--')
+            for prop in confidence_interval_format:
+                getattr(line,'set_' + prop)(confidence_interval_format[prop])
+                # line.set_linestyle('--')
     axis_est_deaths.legend(handles=axis_est_deaths.get_lines())
     return axis_est_deaths, country_label
 
@@ -140,8 +206,16 @@ def enable_time_series_plot(
         )
     return in_df
 
-def plot_forecast_countries(
+def plot_forecast_countries(*args, **kwargs):
+    return plot_timeseries_countries(plot_forecast_country, *args, **kwargs)
+
+def plot_model_countries(*args, **kwargs):
+    return plot_timeseries_countries(plot_model_country, *args, **kwargs)
+
+def plot_timeseries_countries(
+    plot_timeseries_func,
     forecast_df, 
+    *,
     country_list=None,
     color_cyle=[],
     max_date=None,
@@ -162,8 +236,8 @@ def plot_forecast_countries(
 
     for country in country_list:
         # plot the country specific forecast
-        axout, main_label = plot_forecast_country(
-            forecast_df, country, 
+        axout, main_label = plot_timeseries_func(
+            forecast_df, country,
             ax=ax, **kwargs)
         label_list.append(main_label)
     
