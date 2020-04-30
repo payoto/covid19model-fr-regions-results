@@ -13,6 +13,16 @@ confidence_interval_format = {
     "linestyle": '--'
 }
 
+def get_next_color(ax_plot):
+    """Utility which gets the next color in the axis `ax_plot` color cycle by
+    adding and removing a dot at the centre of the plot."""
+    x_min, x_max = ax_plot.get_xlim()
+    y_min, y_max = ax_plot.get_ylim()
+    line_color, = ax_plot.plot((x_min + x_max)/2, (y_min + y_max)/2)
+    color_out = line_color.get_color() 
+    line_color.remove()
+    return color_out
+
 def plot_forecast_country(
     forecast_df,
     country,
@@ -105,6 +115,8 @@ def plot_timeseries_confidence_interval_country(
 ):
     """ Plots the time series of a confidence interval.
 
+    Some pre and post processing of the function `plot_timeseries_country`
+
     Arguments:
         forecast_df (pd.Dataframe) : a data frame whic results from loading
         <run-name>-forecast-data.csv
@@ -141,6 +153,39 @@ def plot_timeseries_confidence_interval_country(
         AttributeError(
             "Label passed to `plot_forecast_country` should be of length 3")
 
+    axis_est_deaths, _ = plot_timeseries_country(
+        forecast_df,
+        active_columns,
+        plot_quantity,
+        country,
+        country_label=country_label,
+        country_field=country_field,
+        **kwargs
+    )
+
+    # Formatting of the confidence interval lines to be dashed
+    for line in axis_est_deaths.get_lines():
+        if lower_ci_mark in line.get_label()\
+            or upper_ci_mark in line.get_label():
+            for prop in confidence_interval_format:
+                getattr(line,'set_' + prop)(confidence_interval_format[prop])
+                # line.set_linestyle('--')
+    axis_est_deaths.legend(handles=axis_est_deaths.get_lines())
+    return axis_est_deaths, country_label
+
+def plot_timeseries_country(
+    forecast_df,
+    active_columns,
+    plot_quantity, # y label of the plot
+    country,
+    *,
+    country_label=None,
+    country_field="country",
+    **kwargs
+):
+    if country_label is None:
+        country_label = country
+    
     # Compute the date field which is used as the x-axis
     forecast_df = enable_time_series_plot(
         forecast_df,
@@ -153,16 +198,9 @@ def plot_timeseries_confidence_interval_country(
         _, ax_plot = plt.subplots()
         kwargs['ax'] = ax_plot
 
-    color_arg = {}
-    if 'color' in kwargs:
-        color_arg['color'] = kwargs['color']
-
-    line_color, = ax_plot.plot(forecast_df["date"].iloc[1],
-        forecast_df[active_columns[0]].iloc[1],
-        **color_arg
-    )
-    kwargs['color'] = line_color.get_color()
-    line_color.remove()
+    if 'color' not in kwargs:
+        kwargs['color'] = get_next_color(ax_plot)
+    
     try:
         # plot time series quantity
         axis_est_deaths = forecast_df.loc[
@@ -179,18 +217,9 @@ def plot_timeseries_confidence_interval_country(
             return ax_plot, country_label
         else:
             raise errid
-    
-    axis_est_deaths.set_ylabel(plot_quantity)
-    # Formatting of the confidence interval lines to be dashed
-    for line in axis_est_deaths.get_lines():
-        if lower_ci_mark in line.get_label()\
-            or upper_ci_mark in line.get_label():
-            for prop in confidence_interval_format:
-                getattr(line,'set_' + prop)(confidence_interval_format[prop])
-                # line.set_linestyle('--')
-    axis_est_deaths.legend(handles=axis_est_deaths.get_lines())
-    return axis_est_deaths, country_label
 
+    axis_est_deaths.set_ylabel(plot_quantity)
+    return axis_est_deaths, country_label
 
 def enable_time_series_plot(
     in_df, 
