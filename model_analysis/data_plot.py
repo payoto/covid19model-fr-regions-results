@@ -15,7 +15,7 @@ except Exception as e:
 type(error_pd_empty_plot)
 
 confidence_interval_format = {
-    "linestyle": '--',
+    "linestyle": ':',
     "marker": '',
 }
 default_color_cycle = plt.rcParams['axes.prop_cycle']
@@ -474,26 +474,40 @@ def compare_fatality_predictions(
     ax=None,
     prop_cycle=None,
     max_num_country_ci_display=3,
+    plot_specific_kwargs={},
     **kwargs
     ):
     if prop_cycle is None:
-        # define a new property cycle for the axes we are using
+        # define a new property cycle to ensure the colour repeats correctly
         prop_cycle = define_new_cycle(
-            marker=['o',',','v','+'], # which varies the marker
-            color_frequency=len(country_list), # the same colour repats every 3 lines
+            marker=['o',',',','], # which varies the marker
+            color_frequency=len(country_list), # the same colour repeats every len(country_list) lines
             markevery=[5],  # Markers are plotted every 5 days
         )
     if ax is None:
         _, ax = plt.subplots()
         ax.set_prop_cycle(prop_cycle)
+    
+    # Get the correct precedence of keyword args
+    plot_kwargs = {
+        "report": {'linestyle':'', 'markevery':1, 'marker': 'o'},
+        "model": {},
+        "forecast": {'linestyle':'--'},
+    }
+    for plot in plot_kwargs:
+        for kwarg in kwargs:
+            plot_kwargs[plot][kwarg] = kwargs[kwarg]
+    for plot in plot_specific_kwargs:
+        for kwarg in plot_specific_kwargs[plot]:
+            plot_kwargs[plot][kwarg] = plot_specific_kwargs[plot][kwarg]
 
     # Plot the data (the reported data without any line, and with a marker every time)
     plot_report_countries(data_dict["modelling"], country_list=country_list,
-        ax=ax, linestyle='', markevery=1, **kwargs)
+        ax=ax, **plot_kwargs["report"])
     plot_model_countries(data_dict["modelling"], country_list=country_list,
-        ax=ax, **kwargs)
+        ax=ax, **plot_kwargs["model"])
     plot_forecast_countries(data_dict["forecasting"], country_list=country_list,
-        ax=ax, **kwargs)
+        ax=ax, **plot_kwargs["forecast"])
 
     # For clarity we remove the confidence intervals and the move the legend out
     if max_num_country_ci_display >= len(country_list):
