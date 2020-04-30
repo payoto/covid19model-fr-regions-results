@@ -1,6 +1,9 @@
 import pandas as pd
 from matplotlib import pyplot as plt
 
+# Marks a confidence interval
+_ci_mark = "CI_"
+
 # Collect the error behaviour of pandas when plotting an empty dataframe
 error_pd_empty_plot = Exception()
 try:
@@ -23,6 +26,28 @@ def get_next_color(ax_plot):
     line_color.remove()
     return color_out
 
+def get_confidence_interval_lines(ax):
+    ci_lines = []
+    for line in ax.get_lines():
+        if _ci_mark in line.get_label():
+            is_ci_line = True
+            for prop in confidence_interval_format:
+                is_ci_line &= (
+                    getattr(line,'get_' + prop)() 
+                    == confidence_interval_format[prop]
+                )
+            if is_ci_line:
+                ci_lines.append(line)
+    return ci_lines
+
+def remove_confidence_interval_lines(ax):
+    for line in get_confidence_interval_lines(ax):
+        line.remove()
+
+def remove_confidence_interval_legend_labels(ax):
+    ci_lines = get_confidence_interval_lines(ax)
+    line_legend = [l for l in ax.get_lines() if l not in ci_lines]
+    ax.legend(handles=line_legend)
 
 def plot_forecast_country(
     forecast_df,
@@ -152,6 +177,7 @@ def plot_timeseries_confidence_interval_country(
     *,
     country_label=None,
     country_field="country",
+    confidence_bound=95,
     **kwargs
 ):
     """ Plots the time series of a confidence interval.
@@ -180,8 +206,8 @@ def plot_timeseries_confidence_interval_country(
         )
 
     if 'label' not in kwargs:
-        upper_ci_mark = '_upper_CI95'
-        lower_ci_mark = '_lower_CI95'
+        upper_ci_mark = f'_upper_{_ci_mark}{confidence_bound}'
+        lower_ci_mark = f'_lower_{_ci_mark}{confidence_bound}'
         kwargs['label'] = [
             country_label,
             country_label + upper_ci_mark,
@@ -237,8 +263,7 @@ def plot_timeseries_country(
             ]
     # Compute the date field which is used as the x-axis
     forecast_df = enable_time_series_plot(
-        forecast_df,
-        timeseries_field_out='date'
+        forecast_df, timeseries_field_out='date'
     )
 
     if 'ax' in kwargs:
@@ -292,6 +317,9 @@ def enable_time_series_plot(
 def plot_forecast_countries(*args, **kwargs):
     return plot_timeseries_countries(plot_forecast_country, *args, **kwargs)
 
+def plot_report_countries(*args, **kwargs):
+    return plot_timeseries_countries(plot_report_country, *args, **kwargs)
+
 
 def plot_model_countries(*args, **kwargs):
     return plot_timeseries_countries(plot_model_country, *args, **kwargs)
@@ -333,7 +361,8 @@ def plot_timeseries_countries(
     if not (min_date is None):
         axout.set_xlim(left=max(x_min, pd.to_datetime(min_date)))
     # Select only mean lines to appear in legend
-    line_legend = [l for l in axout.get_lines() if l.get_label() in label_list]
-    axout.legend(handles=line_legend)
+    # line_legend = [l for l in axout.get_lines() if l.get_label() in label_list]
+    # axout.legend(handles=line_legend)
+    remove_confidence_interval_legend_labels(axout)
     
     return axout
