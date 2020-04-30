@@ -52,6 +52,7 @@ def plot_forecast_country(
         **kwargs
     )
 
+
 def plot_model_country(
     model_df,
     country,
@@ -149,7 +150,8 @@ def plot_timeseries_confidence_interval_country(
     if 'ax' in kwargs:
         ax_plot = kwargs['ax']
     else:
-        ax_plot = plt
+        _, ax_plot = plt.subplots()
+        kwargs['ax'] = ax_plot
 
     color_arg = {}
     if 'color' in kwargs:
@@ -189,6 +191,7 @@ def plot_timeseries_confidence_interval_country(
     axis_est_deaths.legend(handles=axis_est_deaths.get_lines())
     return axis_est_deaths, country_label
 
+
 def enable_time_series_plot(
     in_df, 
     timein_field='time', 
@@ -206,11 +209,14 @@ def enable_time_series_plot(
         )
     return in_df
 
+
 def plot_forecast_countries(*args, **kwargs):
     return plot_timeseries_countries(plot_forecast_country, *args, **kwargs)
 
+
 def plot_model_countries(*args, **kwargs):
     return plot_timeseries_countries(plot_model_country, *args, **kwargs)
+
 
 def plot_timeseries_countries(
     plot_timeseries_func,

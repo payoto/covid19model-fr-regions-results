@@ -38,11 +38,11 @@ def get_analysis_set(
         run_manifest = read_manifest(run_manifest)
     
     analysis_set = run_manifest[run_manifest.apply(selection_fun ,axis=1)]
-    analysis_set['data'] = None
+    analysis_set['model'] = None
 
     for index, row in analysis_set.iterrows():
-        analysis_set.loc[index, 'data'] = Model_Folder(row['folder'].strip())
-        analysis_set.loc[index, 'data'].load_data(data_to_load)
+        analysis_set.loc[index, 'model'] = Model_Folder(row['folder'].strip())
+        analysis_set.loc[index, 'model'].load_data(data_to_load)
     return analysis_set
 
 class Model_Folder(object):
