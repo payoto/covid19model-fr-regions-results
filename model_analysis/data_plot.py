@@ -23,6 +23,7 @@ def get_next_color(ax_plot):
     line_color.remove()
     return color_out
 
+
 def plot_forecast_country(
     forecast_df,
     country,
@@ -93,6 +94,46 @@ def plot_model_country(
     
     print(f"Plotting model for {country_label}")
     return plot_timeseries_confidence_interval_country(
+        model_df,
+        active_columns, 
+        plot_quantity, # y label of the plot
+        country,
+        country_label=country_label,
+        country_field=country_field,
+        **kwargs
+    )
+
+
+def plot_report_country(
+    model_df,
+    country,
+    *,
+    country_label=None,
+    **kwargs
+):
+    """ Plots the forecasted daily deaths with the 95% confidence interval.
+
+    Arguments:
+        model_df (pd.Dataframe) : a data frame whic results from loading
+        <run-name>-forecast-data.csv
+        country (str) : a string corresponding to a country in the 
+
+    kwargs are passed to `pd.Dataframe.plot()`:
+        color (str): A color hex string
+        ax (plt.Axes) : An axis 
+    """
+    # Select the active columns
+    active_columns = [
+        "deaths",
+    ]
+    plot_quantity = "Reported daily deaths"
+    date_label = max(model_df["time"])
+    country_field="region"
+    if country_label is None:
+        country_label = f"{country} (Reported deaths to {date_label})"
+    
+    print(f"Plotting reports for {country_label}")
+    return plot_timeseries_country(
         model_df,
         active_columns, 
         plot_quantity, # y label of the plot
@@ -173,6 +214,7 @@ def plot_timeseries_confidence_interval_country(
     axis_est_deaths.legend(handles=axis_est_deaths.get_lines())
     return axis_est_deaths, country_label
 
+
 def plot_timeseries_country(
     forecast_df,
     active_columns,
@@ -185,7 +227,14 @@ def plot_timeseries_country(
 ):
     if country_label is None:
         country_label = country
-    
+
+    if 'label' not in kwargs:
+        if len(active_columns)==1:
+            kwargs['label'] = [country_label]
+        else:
+            kwargs['label'] = [
+                country_label + col for col in active_columns
+            ]
     # Compute the date field which is used as the x-axis
     forecast_df = enable_time_series_plot(
         forecast_df,
@@ -220,6 +269,7 @@ def plot_timeseries_country(
 
     axis_est_deaths.set_ylabel(plot_quantity)
     return axis_est_deaths, country_label
+
 
 def enable_time_series_plot(
     in_df, 
