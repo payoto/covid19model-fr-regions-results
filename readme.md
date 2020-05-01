@@ -31,8 +31,13 @@ This repository is also available on [Kaggle](https://www.kaggle.com/mrpayoto/co
 Analysis of the data is facilitated by an example jupyter notebook which
 shows usage of the `model_analysis` python package which is under development.
 
-See the [`data_load` notebook](data_load.ipynb) or the
+See the [`data_example` notebook](data_example.ipynb) or the
 [`model_analysis` package](model_analysis/) for more info.
+
+### Example dataset and visualisation
+
+- Tutorial and explained on how to load data and plot it[`data_example`](data_example.ipynb)
+- A short notebook analysing the amount of data after a NPI to ensure convergence [`analysis_report_convergence`](analysis_report_convergence.ipynb)
 
 ## Adding to the data
 
@@ -133,5 +138,3 @@ Other columns are detailed in tabular form below. Notes:
 | `"rt_min2"`            | Inferred | instantaneous | 0.25%           | R_t total reproduction number |
 | `"rt_max2"`            | Inferred | instantaneous | 0.75%           | R_t total reproduction number |
 
-
-## Example dataset and visualisation

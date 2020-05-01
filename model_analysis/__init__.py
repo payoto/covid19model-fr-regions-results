@@ -15,4 +15,5 @@ from .data_plot import (
 )
 
 from . import data_plot as icl_plot
+from . import data_load as icl_load
                     
