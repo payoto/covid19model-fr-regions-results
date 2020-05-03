@@ -155,7 +155,7 @@ def plot_forecast_country(
     if country_label is None:
         country_label = f"{country} (forecast from {date_label})"
     country_field = "country"
-    print(f"Plotting forecast for {country_label}")
+
     return plot_timeseries_confidence_interval_country(
         forecast_df,
         active_columns,
@@ -163,6 +163,7 @@ def plot_forecast_country(
         country,
         country_label=country_label,
         country_field=country_field,
+        timeseries_type="forecast",
         **kwargs
     )
 
@@ -195,7 +196,6 @@ def plot_model_country(
     if country_label is None:
         country_label = f"{country} (model to {date_label})"
     
-    print(f"Plotting model for {country_label}")
     return plot_timeseries_confidence_interval_country(
         model_df,
         active_columns, 
@@ -203,6 +203,7 @@ def plot_model_country(
         country,
         country_label=country_label,
         country_field=country_field,
+        timeseries_type="model",
         **kwargs
     )
 
@@ -235,7 +236,6 @@ def plot_report_country(
     if country_label is None:
         country_label = f"{country} (Reported deaths to {date_label})"
     
-    print(f"Plotting reports for {country_label}")
     return plot_timeseries_country(
         model_df,
         active_columns, 
@@ -243,6 +243,7 @@ def plot_report_country(
         country,
         country_label=country_label,
         country_field=country_field,
+        timeseries_type="reports",
         **kwargs
     )
 
@@ -275,7 +276,6 @@ def plot_timeseries_confidence_interval_country(
     country,
     *,
     country_label=None,
-    country_field="country",
     confidence_bound=95,
     **kwargs
 ):
@@ -325,7 +325,6 @@ def plot_timeseries_confidence_interval_country(
         plot_quantity,
         country,
         country_label=country_label,
-        country_field=country_field,
         **kwargs
     )
 
@@ -349,10 +348,15 @@ def plot_timeseries_country(
     custom_format_cycle=[],
     country_label=None,
     country_field="country",
+    timeseries_type="time series",
+    verbose=True,
     **kwargs
 ):
     if country_label is None:
         country_label = country
+
+    if verbose:
+        print(f"Plotting {timeseries_type} for {country_label}")
 
     if 'label' not in kwargs:
         if len(active_columns)==1:
