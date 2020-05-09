@@ -25,7 +25,17 @@ def plot_forecast_country(
     Arguments:
         forecast_df (pd.Dataframe) : a data frame whic results from loading
         <run-name>-forecast-data.csv
-        country (str) : a string corresponding to a country in the 
+        country (str) : a string corresponding to a country or geographical zone
+        in the data.
+    
+    Keyword Arguments:
+        country_label (str) : The label to use in the data
+        **kwargs: Keyword arguments are passed to (in order of precedence):
+            - `plot_core.plot_timeseries_confidence_interval_country`
+            - `pd.Dataframe.plot`
+            - `pyplot.plot`
+
+    Example extra keyword args are: color, ax, 
 
     kwargs are passed to `pd.Dataframe.plot()`:
         color (str): A color hex string
@@ -157,6 +167,87 @@ def plot_daily_deaths_country(
     return ax, labels 
 
 
+def plot_Rt_country(
+    model_df,
+    country,
+    *,
+    country_label=None,
+    **kwargs
+):
+    """ Plots Rt (the epidemic reproduction number) with the 95% confidence
+    interval.
+
+    Arguments:
+        model_df (pd.Dataframe) : a data frame which results from loading
+        <run-name>-forecast-data.csv
+        country (str) : a string corresponding to a country in the 
+
+    kwargs are passed to `pd.Dataframe.plot()`:
+        color (str): A color hex string
+        ax (plt.Axes) : An axis 
+    """
+    # Select the active columns
+    active_columns = [
+        "rt", "rt_min", "rt_max",
+    ]
+    plot_quantity = "Inferred $R_t$"
+    date_label = max(model_df["time"])
+    country_field="region"
+    if country_label is None:
+        country_label = f"{country} (model to {date_label})"
+    
+    return plot_core.plot_timeseries_confidence_interval_country(
+        model_df,
+        active_columns, 
+        plot_quantity, # y label of the plot
+        country,
+        country_label=country_label,
+        country_field=country_field,
+        timeseries_type="Inferred R(t)",
+        **kwargs
+    )
+
+def plot_Rt_forecast_country(
+    model_df,
+    country,
+    *,
+    country_label=None,
+    **kwargs
+):
+    """ Plots Rt (the epidemic reproduction number) with the 95% confidence
+    interval.
+
+    Arguments:
+        model_df (pd.Dataframe) : a data frame which results from loading
+        <run-name>-forecast-data.csv
+        country (str) : a string corresponding to a country in the 
+
+    kwargs are passed to `pd.Dataframe.plot()`:
+        color (str): A color hex string
+        ax (plt.Axes) : An axis 
+    """
+    # Select the active columns
+    active_columns = [
+        "rt", "rt_min", "rt_max",
+    ]
+    plot_quantity = "Forecast $R_t$"
+    date_label = min(model_df["time"])
+    country_field="country"
+    if country_label is None:
+        country_label = f"{country} (forecast to {date_label})"
+    
+    return plot_core.plot_timeseries_confidence_interval_country(
+        model_df,
+        active_columns, 
+        plot_quantity, # y label of the plot
+        country,
+        country_label=country_label,
+        country_field=country_field,
+        timeseries_type="Forecast R(t)",
+        **kwargs
+    )
+
+
 def plot_forecast_countries(*args, **kwargs):
     return plot_core.plot_timeseries_countries(plot_forecast_country, *args, **kwargs)
 
@@ -173,6 +264,13 @@ def plot_daily_deaths_countries(*args, **kwargs):
     return plot_core.plot_timeseries_countries(plot_daily_deaths_country, *args, **kwargs)
 
 
+def plot_Rt_countries(*args, **kwargs):
+    return plot_core.plot_timeseries_countries(plot_Rt_country, *args, **kwargs)
+ 
+def plot_Rt_forecast_countries(*args, **kwargs):
+    return plot_core.plot_timeseries_countries(plot_Rt_forecast_country, *args, **kwargs)
+
+
 def compare_fatality_predictions(
     data_dict,
     country_list=None,
@@ -181,7 +279,7 @@ def compare_fatality_predictions(
     max_num_country_ci_display=3,
     plot_specific_kwargs={},
     **kwargs
-    ):
+):
     if prop_cycle is None:
         # define a new property cycle to ensure the colour repeats correctly
         prop_cycle = plot_core.define_new_cycle(
@@ -221,4 +319,56 @@ def compare_fatality_predictions(
         plot_core.remove_confidence_interval_lines(ax)
 
     plot_core.modify_legend(ax, bbox_to_anchor=(1.04, 1.0), loc='upper left')
+    return ax
+
+def compare_rt_and_interventions(
+    data_dict,
+    country_list=None,
+    ax=None,
+    prop_cycle=None,
+    max_num_country_ci_display=3,
+    plot_specific_kwargs={},
+    **kwargs
+):
+    if prop_cycle is None:
+        # define a new property cycle to ensure the colour repeats correctly
+        prop_cycle = plot_core.define_new_cycle(
+            marker=[',',','], # which varies the marker
+            color_frequency=len(country_list), # the same colour repeats every len(country_list) lines
+            markevery=[5],  # Markers are plotted every 5 days
+        )
+    if ax is None:
+        _, ax = plt.subplots()
+        ax.set_prop_cycle(prop_cycle)
+    
+    # Get the correct precedence of keyword args
+    plot_kwargs = {
+        "interventions": {},
+        "model": {},
+        "forecast": {'linestyle':'--'},
+    }
+    for plot in plot_kwargs:
+        for kwarg in kwargs:
+            plot_kwargs[plot][kwarg] = kwargs[kwarg]
+    for plot in plot_specific_kwargs:
+        for kwarg in plot_specific_kwargs[plot]:
+            plot_kwargs[plot][kwarg] = plot_specific_kwargs[plot][kwarg]
+
+    # Plot the data (the reported data without any line, and with a marker every time)
+    plot_Rt_countries(data_dict["modelling"], country_list=country_list,
+        ax=ax, **plot_kwargs["model"])
+    plot_Rt_forecast_countries(data_dict["forecasting"], country_list=country_list,
+        ax=ax, **plot_kwargs["forecast"])
+    
+
+    # For clarity we remove the confidence intervals and the move the legend out
+    if max_num_country_ci_display >= len(country_list):
+        plot_core.remove_confidence_interval_legend_labels(ax)
+    else:
+        plot_core.remove_confidence_interval_lines(ax)
+
+    plot_core.modify_legend(ax, bbox_to_anchor=(1.04, 1.0), loc='upper left')
+    plot_core.plot_interventions_countries(
+        data_dict["interventions"], country_list, ax=ax, **plot_kwargs["interventions"])
+
     return ax

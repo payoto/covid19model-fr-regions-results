@@ -19,6 +19,16 @@ except Exception as e:
 type(error_pd_empty_plot)
 
 default_color_cycle = plt.rcParams['axes.prop_cycle']
+
+# 
+intervention_labels = {
+    "lockdown" : "Lockdown",
+    "public_events" : "Cancel events",
+    "schools_universities": "School closures",
+    "self_isolating_if_ill": "Self-isolation when ill",
+    "social_distancing_encouraged": "Social distancing",
+}
+
 # Defines extensions to matplotlib for convenience
 
 def get_next_color(
@@ -60,7 +70,7 @@ def remove_confidence_interval_legend_labels(ax):
     line_legend = [l for l in ax.get_lines() if l not in ci_lines]
     ax.legend(handles=line_legend)
 
-def modify_legend(ax, **kwargs):
+def get_current_legend_handles(ax):
     label_list = [t.get_text() for t in ax.get_legend().get_texts()]
     handles, labels = ax.get_legend_handles_labels()
     copy_handles = []
@@ -69,15 +79,27 @@ def modify_legend(ax, **kwargs):
         if label in label_list:
             copy_handles.append(handle)
             copy_labels.append(label)
+    return copy_handles, copy_labels
+
+def add_lines_to_legend(ax, handles, labels=None):
+    copy_handles, copy_labels = get_current_legend_handles(ax)
+    copy_handles.extend(handles)
+    if labels is None:
+        labels = [h.get_label() for h in handles]
+    copy_labels.extend(labels)
+    ax.legend(handles=copy_handles, labels=copy_labels)
+
+def modify_legend(ax, **kwargs):
+    copy_handles, copy_labels = get_current_legend_handles(ax)
     ax.legend(handles=copy_handles, labels=copy_labels, **kwargs)
 
-def axis_date_limits(ax, min_date=None, max_date=None):
+def axis_date_limits(ax, min_date=None, max_date=None, format_date=None):
     # Tailor axis limits
     x_min, x_max = pd.to_datetime(ax.get_xlim(), unit='D')
     if not (max_date is None):
-        ax.set_xlim(right=min(x_max, pd.to_datetime(max_date)))
+        ax.set_xlim(right=min(x_max, pd.to_datetime(max_date, format=format_date)))
     if not (min_date is None):
-        ax.set_xlim(left=max(x_min, pd.to_datetime(min_date)))
+        ax.set_xlim(left=max(x_min, pd.to_datetime(min_date, format=format_date)))
 
 def define_new_cycle(
     color_period=None,
@@ -314,3 +336,122 @@ def plot_timeseries_countries(
     remove_confidence_interval_legend_labels(axout)
     
     return axout
+
+def plot_interventions_countries(
+    df_interventions,
+    country_list,
+    *,
+    ax=None,
+    prop_cycle=None,
+    color_cycle=None,
+    color=None,
+    label_func=lambda row: f"{row['country']}: {row['key']}",
+    **kwargs
+):
+    """ Plots interventions as vertical lines.
+    """
+    # Input handling
+    if ax is None:
+        fig, ax = plt.subplots()
+    
+    if prop_cycle is None:  # Define the default property cycle
+        prop_cycle = cycler(
+            linestyle=['-','--', '-.', ':', ':'],
+            marker=['o', 's', 'v', '+', 'x']
+        )
+
+    if (color is not None) and (color_cycle is not None):
+        raise ValueError("`color` and `color_cycle` cannot be both specified.")
+    
+    if color is not None:
+        color_cyle = cycler(color = [color])
+
+    # Trim the list of interventions to only the relevant ones
+    trimmed_interventions = find_unique_interventions(
+        df_interventions, country_list
+    )
+    
+    # Define the correct color_cycle that will match the order of the trimmed
+    # intervention list
+    if color_cycle is None: 
+        trimmed_list = trimmed_interventions["country"].unique()
+        color_list = []
+        for i, country in enumerate(country_list):
+            if country in trimmed_list:
+                color_list.append(
+                    default_color_cycle.by_key()['color'][i]
+                )
+        color_cyle = cycler(
+            color=color_list
+        )
+
+    # Set the property cycle
+    ax.set_prop_cycle(prop_cycle * color_cyle)
+    # Prepare the interventions for plotting
+    trimmed_interventions = enable_time_series_plot(trimmed_interventions, "value")
+    trimmed_interventions.sort_values(by=["key", "country", "date"], inplace=True)
+    ylims = ax.get_ylim()
+    vlines = []
+    d_dict = {}
+    # Plot the lines
+    for i, row in trimmed_interventions.iterrows():
+        d = row["date"].value/(1000000000*60*60*24) # get it in fucking days
+        try: # offset markers when multiple interventions happen on the same day
+            d_dict[d] += 1
+        except:
+            d_dict[d] = 0
+
+        vlines.extend(
+            ax.plot([d, d], [ylims[0], ylims[1] * (1 - 0.04 * d_dict[d])], 
+                label=label_func(row), **kwargs
+            )
+        )
+
+    # Create custom legend lines
+    legend_lines = []
+    for inter, props in zip(trimmed_interventions["key"].unique(), prop_cycle):
+        if inter not in intervention_labels:
+            intervention_labels[inter] = inter
+            print(f"WARNING: intervention {inter} does not have a label, "
+            + "consider setting `plot_core.intervention_labels['"
+            + f"{inter}']` for better legends of plots.")
+        legend_lines.append(
+            plt.Line2D([0], [0], color="k", lw=2, 
+                marker=props["marker"], label=intervention_labels[inter],
+                ls=props["linestyle"]),
+
+        )
+    
+    try:
+        lg = ax.get_legend()
+        lg.set_bbox_to_anchor((1.04, 0.5))
+        ax.add_artist(lg)
+    except:
+        pass
+    # Add a legend
+    ax.legend(
+        handles=legend_lines, title="Intervention types",
+        bbox_to_anchor=(1.04, 1.0),
+        loc='upper left'
+    )
+    return ax, (vlines, legend_lines)
+
+def find_unique_interventions(df_interventions, region_list):
+    """ Given a list of regions returns a datafram similar to df_interventions
+    with no repeated intervention.
+
+    This is used to trim repeated interventions that arise from modelling regions
+    and countries together.
+    """
+    act_interventions = df_interventions.apply(
+        lambda x: x["region"] in region_list, axis=1
+    )
+    grouped_interventions = df_interventions.loc[act_interventions,].groupby(
+        ["key", "value","country"])
+    trimmed_interventions = []
+
+    for group_val, group in grouped_interventions:
+        trimmed_interventions.append(group.iloc[0, ])
+        trimmed_interventions[-1]["region"] = group["region"].unique()
+
+    return pd.DataFrame(trimmed_interventions)

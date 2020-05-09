@@ -66,7 +66,7 @@ See the [`data_example` notebook](data_example.ipynb) or the
   - `<run name>-base-plot.csv` : Time series of the fitted data from start time-to simulation time, no forecast.
   - `<run name>-forecast-data.csv` : 7 days time series forecast for each region.
 
-### Detailed descriptions
+### Detailed description of data files
 
 In progress
 

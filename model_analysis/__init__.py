@@ -9,6 +9,9 @@ from .data_plot import (
     plot_report_country, plot_report_countries,
     plot_daily_deaths_countries, plot_daily_deaths_country,
     compare_fatality_predictions,
+    compare_rt_and_interventions,
+    plot_Rt_country, plot_Rt_countries,
+    plot_Rt_forecast_country, plot_Rt_forecast_countries,
 )
 
 from .plot_core import (
@@ -19,6 +22,7 @@ from .plot_core import (
     axis_date_limits,
     define_new_cycle,
     default_color_cycle,
+    plot_interventions_countries,
 )
 
 from . import data_plot as icl_plot
