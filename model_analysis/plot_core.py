@@ -25,7 +25,7 @@ intervention_labels = {
     "lockdown" : "Lockdown",
     "public_events" : "Cancel events",
     "schools_universities": "School closures",
-    "self_isolating_if_ill": "Self-isolation when ill",
+    "self_isolating_if_ill": "Self-isolation\nwhen ill",
     "social_distancing_encouraged": "Social distancing",
 }
 
@@ -72,14 +72,16 @@ def remove_confidence_interval_legend_labels(ax):
 
 def get_current_legend_handles(ax):
     label_list = [t.get_text() for t in ax.get_legend().get_texts()]
+    line_list = [l for l in ax.get_legend().get_lines()]
     handles, labels = ax.get_legend_handles_labels()
-    copy_handles = []
-    copy_labels = []
+
+    handler_map = ax.get_legend().get_legend_handler_map()
+
     for handle, label in zip(handles, labels):
         if label in label_list:
-            copy_handles.append(handle)
-            copy_labels.append(label)
-    return copy_handles, copy_labels
+            line_list[label_list.index(label)] = handle
+    
+    return line_list, label_list
 
 def add_lines_to_legend(ax, handles, labels=None):
     copy_handles, copy_labels = get_current_legend_handles(ax)
@@ -346,6 +348,7 @@ def plot_interventions_countries(
     color_cycle=None,
     color=None,
     label_func=lambda row: f"{row['country']}: {row['key']}",
+    verbose=False,
     **kwargs
 ):
     """ Plots interventions as vertical lines.
@@ -435,6 +438,60 @@ def plot_interventions_countries(
         loc='upper left'
     )
     return ax, (vlines, legend_lines)
+
+def compare_report_model_predictions(
+    compare_func,
+    data_dict,
+    country_list=None,
+    ax=None,
+    prop_cycle=None,
+    max_num_country_ci_display=3,
+    plot_specific_kwargs={},
+    plot_forecast=True,
+    **kwargs
+):
+    marker_list=['o',',',',']
+    if not plot_forecast:
+        marker_list.pop(-1)
+
+    if prop_cycle is None:
+        # define a new property cycle to ensure the colour repeats correctly
+        prop_cycle = define_new_cycle(
+            marker=marker_list, # which varies the marker
+            color_frequency=len(country_list), # the same colour repeats every len(country_list) lines
+            markevery=[5],  # Markers are plotted every 5 days
+        )
+    if ax is None:
+        _, ax = plt.subplots()
+        ax.set_prop_cycle(prop_cycle)
+    
+    # Get the correct precedence of keyword args
+    plot_kwargs = {
+        "report": {'linestyle':'', 'markevery':1, 'marker': 'o'},
+        "model": {},
+        "forecast": {'linestyle':'--'},
+    }
+    for plot in plot_kwargs:
+        for kwarg in kwargs:
+            plot_kwargs[plot][kwarg] = kwargs[kwarg]
+    for plot in plot_specific_kwargs:
+        for kwarg in plot_specific_kwargs[plot]:
+            plot_kwargs[plot][kwarg] = plot_specific_kwargs[plot][kwarg]
+
+    # Plot the data (the reported data without any line, and with a marker every time)
+    compare_func(
+        data_dict, plot_kwargs, 
+        country_list=country_list, ax=ax, plot_forecast=plot_forecast
+    )
+
+    # For clarity we remove the confidence intervals and the move the legend out
+    if max_num_country_ci_display >= len(country_list):
+        remove_confidence_interval_legend_labels(ax)
+    else:
+        remove_confidence_interval_lines(ax)
+
+    modify_legend(ax, bbox_to_anchor=(1.04, 1.0), loc='upper left')
+    return ax
 
 def find_unique_interventions(df_interventions, region_list):
     """ Given a list of regions returns a datafram similar to df_interventions

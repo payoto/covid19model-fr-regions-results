@@ -54,7 +54,7 @@ class Model_Folder(object):
         'modelling': 'base-plot',
         'forecasting': 'forecast-data',
         'ifr': 'inputs-active_regions_ifr',
-        'reprocution': 'final-Rt',
+        'reprodution': 'final-Rt',
         # 'mu': 'final-mu',
         'NPI impact': 'covars-alpha-reduction',
     }
