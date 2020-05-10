@@ -97,7 +97,11 @@ def modify_legend(ax, **kwargs):
 
 def axis_date_limits(ax, min_date=None, max_date=None, format_date=None):
     # Tailor axis limits
-    x_min, x_max = pd.to_datetime(ax.get_xlim(), unit='D')
+    try:
+        x_min, x_max = pd.to_datetime(ax.get_xlim(), unit='D')
+    except:
+        print("Warning: Failed to run `pd.to_datetime(ax.get_xlim(), unit='D')`")
+
     if not (max_date is None):
         ax.set_xlim(right=min(x_max, pd.to_datetime(max_date, format=format_date)))
     if not (min_date is None):
@@ -389,7 +393,12 @@ def plot_interventions_countries(
         )
 
     # Set the property cycle
-    ax.set_prop_cycle(prop_cycle * color_cyle)
+    try:
+        ax.set_prop_cycle(prop_cycle * color_cyle)
+    except Exception as e:
+        print(prop_cycle)
+        print(color_cycle)
+        raise e
     # Prepare the interventions for plotting
     trimmed_interventions = enable_time_series_plot(trimmed_interventions, "value")
     trimmed_interventions.sort_values(by=["key", "country", "date"], inplace=True)
@@ -463,6 +472,7 @@ def compare_report_model_predictions(
         )
     if ax is None:
         _, ax = plt.subplots()
+    if len(country_list) > 1:
         ax.set_prop_cycle(prop_cycle)
     
     # Get the correct precedence of keyword args

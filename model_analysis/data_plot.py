@@ -43,7 +43,9 @@ def plot_forecast_country(
     """
     # Select the active columns
     active_columns = [
-        col for col in forecast_df.columns if 'estimated_deaths' in col
+        'estimated_deaths_forecast',
+        'estimated_deaths_forecast_min',
+        'estimated_deaths_forecast_max',
     ]
     plot_quantity = "Forecasted daily deaths"
     date_label = min(forecast_df["time"])
@@ -166,6 +168,163 @@ def plot_daily_deaths_country(
     plot_core.remove_confidence_interval_legend_labels(ax)
     return ax, labels 
 
+# plots the fatalities (cumulated)
+
+def plot_all_deaths_forecast_country(
+    forecast_df,
+    country,
+    *,
+    country_label=None,
+    **kwargs
+):
+    """ Plots the forecasted daily deaths with the 95% confidence interval.
+
+    Arguments:
+        forecast_df (pd.Dataframe) : a data frame whic results from loading
+        <run-name>-forecast-data.csv
+        country (str) : a string corresponding to a country or geographical zone
+        in the data.
+    
+    Keyword Arguments:
+        country_label (str) : The label to use in the data
+        **kwargs: Keyword arguments are passed to (in order of precedence):
+            - `plot_core.plot_timeseries_confidence_interval_country`
+            - `pd.Dataframe.plot`
+            - `pyplot.plot`
+
+    Example extra keyword args are: color, ax, 
+
+    kwargs are passed to `pd.Dataframe.plot()`:
+        color (str): A color hex string
+        ax (plt.Axes) : An axis 
+    """
+    # Select the active columns
+    active_columns = [
+        'estimated_deaths_forecast_c',
+        'estimated_deaths_forecast_min_c',
+        'estimated_deaths_forecast_max_c',
+    ]
+    plot_quantity = "Forecasted daily deaths"
+    date_label = min(forecast_df["time"])
+    
+    if country_label is None:
+        country_label = f"{country} (forecast from {date_label})"
+    country_field = "country"
+
+    return plot_core.plot_timeseries_confidence_interval_country(
+        forecast_df,
+        active_columns,
+        plot_quantity, # y label of the plot
+        country,
+        country_label=country_label,
+        country_field=country_field,
+        timeseries_type="forecast",
+        **kwargs
+    )
+
+
+def plot_all_deaths_model_country(
+    model_df,
+    country,
+    *,
+    country_label=None,
+    **kwargs
+):
+    """ Plots the forecasted daily deaths with the 95% confidence interval.
+
+    Arguments:
+        model_df (pd.Dataframe) : a data frame whic results from loading
+        <run-name>-forecast-data.csv
+        country (str) : a string corresponding to a country in the 
+
+    kwargs are passed to `pd.Dataframe.plot()`:
+        color (str): A color hex string
+        ax (plt.Axes) : An axis 
+    """
+    # Select the active columns
+    active_columns = [
+        "estimated_deaths_c", "death_min_c", "death_max_c",
+    ]
+    plot_quantity = "Modelled total deaths"
+    date_label = max(model_df["time"])
+    country_field="region"
+    if country_label is None:
+        country_label = f"{country} (model to {date_label})"
+    
+    return plot_core.plot_timeseries_confidence_interval_country(
+        model_df,
+        active_columns, 
+        plot_quantity, # y label of the plot
+        country,
+        country_label=country_label,
+        country_field=country_field,
+        timeseries_type="model",
+        **kwargs
+    )
+
+
+def plot_all_deaths_report_country(
+    model_df,
+    country,
+    *,
+    country_label=None,
+    **kwargs
+):
+    """ Plots the forecasted daily deaths with the 95% confidence interval.
+
+    Arguments:
+        model_df (pd.Dataframe) : a data frame whic results from loading
+        <run-name>-forecast-data.csv
+        country (str) : a string corresponding to a country in the 
+
+    kwargs are passed to `pd.Dataframe.plot()`:
+        color (str): A color hex string
+        ax (plt.Axes) : An axis 
+    """
+    # Select the active columns
+    active_columns = [
+        "deaths_c",
+    ]
+    plot_quantity = "Reported total deaths"
+    date_label = max(model_df["time"])
+    country_field="region"
+    if country_label is None:
+        country_label = f"{country} (Reported deaths to {date_label})"
+    
+    return plot_core.plot_timeseries_country(
+        model_df,
+        active_columns, 
+        plot_quantity, # y label of the plot
+        country,
+        country_label=country_label,
+        country_field=country_field,
+        timeseries_type="reports",
+        **kwargs
+    )
+
+
+def plot_all_deaths_country(
+    data_dict,
+    country,
+    *,
+    ax=None,
+    **kwargs
+):
+    if ax is None:
+        fig, ax = plt.subplots()
+    labels = ['', '', '']
+    ax, labels[0] = plot_all_deaths_report_country(
+        data_dict["modelling"], country, ax=ax, **kwargs
+    )
+    ax, labels[1] = plot_all_deaths_model_country(
+        data_dict["modelling"], country, ax=ax, **kwargs
+    )
+    ax, labels[2] = plot_all_deaths_forecast_country(
+        data_dict["forecasting"], country, ax=ax, **kwargs
+    )
+    plot_core.remove_confidence_interval_legend_labels(ax)
+    return ax, labels 
+
 
 # plots the cases
 
@@ -199,7 +358,9 @@ def plot_case_forecast_country(
     """
     # Select the active columns
     active_columns = [
-        col for col in forecast_df.columns if 'estimated_deaths' in col
+        'estimated_cases_forecast_c',
+        'estimated_cases_forecast_min_c',
+        'estimated_cases_forecast_max_c',
     ]
     plot_quantity = "Forecasted daily deaths"
     date_label = min(forecast_df["time"])
@@ -421,6 +582,22 @@ def plot_model_countries(*args, **kwargs):
 def plot_daily_deaths_countries(*args, **kwargs):
     return plot_core.plot_timeseries_countries(plot_daily_deaths_country, *args, **kwargs)
 
+## Deaths
+def plot_all_deaths_forecast_countries(*args, **kwargs):
+    return plot_core.plot_timeseries_countries(plot_all_deaths_forecast_country, *args, **kwargs)
+
+
+def plot_all_deaths_report_countries(*args, **kwargs):
+    return plot_core.plot_timeseries_countries(plot_all_deaths_report_country, *args, **kwargs)
+
+
+def plot_all_deaths_model_countries(*args, **kwargs):
+    return plot_core.plot_timeseries_countries(plot_all_deaths_model_country, *args, **kwargs)
+
+ 
+def plot_all_deaths_countries(*args, **kwargs):
+    return plot_core.plot_timeseries_countries(plot_all_deaths_country, *args, **kwargs)
+
 ## R_t
 def plot_Rt_countries(*args, **kwargs):
     return plot_core.plot_timeseries_countries(plot_Rt_country, *args, **kwargs)
@@ -462,6 +639,29 @@ def compare_fatality_predictions(
             ax=ax, **plot_kwargs["model"])
         if plot_forecast:
             plot_forecast_countries(
+                data_dict["forecasting"], 
+                country_list=country_list,
+                ax=ax, **plot_kwargs["forecast"]
+            )
+
+    return plot_core.compare_report_model_predictions(
+        compare_func, data_dict, **kwargs)
+
+def compare_all_fatality_predictions(
+    data_dict,
+    **kwargs
+):
+    def compare_func(
+        data_dict, plot_kwargs, country_list=None, ax=None, 
+        plot_forecast=True
+    ):
+        # Plot the data (the reported data without any line, and with a marker every time)
+        plot_all_deaths_report_countries(data_dict["modelling"], country_list=country_list,
+            ax=ax, **plot_kwargs["report"])
+        plot_all_deaths_model_countries(data_dict["modelling"], country_list=country_list,
+            ax=ax, **plot_kwargs["model"])
+        if plot_forecast:
+            plot_all_deaths_forecast_countries(
                 data_dict["forecasting"], 
                 country_list=country_list,
                 ax=ax, **plot_kwargs["forecast"]
@@ -549,3 +749,98 @@ def compare_rt_and_interventions(
         data_dict["interventions"], country_list, ax=ax, **plot_kwargs["interventions"])
 
     return ax
+
+def plot_zones_summary(zones, model_data):
+    """Plots the summary for a zone or zones
+    
+    This summary plot has 5 plots, with daily and cumulated deaths
+    as well as daily cases and reproduction number.
+    """
+    def put_legends_down(ax, ydown=-0.17):
+        legends = [
+            child for child in ax.get_children()
+                if type(child) == type(ax.get_legend())
+        ]
+        for i, legend in enumerate(legends):
+            legend.set_bbox_to_anchor((float(i) / float(len(legends)), ydown))
+        
+        return legends
+
+    def correct_ticklabels(ax):
+        ax.minorticks_off()    
+        ugly_xtick_labels = ax.xaxis.get_major_formatter().format_ticks(ax.get_xticks())
+        ax.set_xticklabels([i.strip("\n") for i in ugly_xtick_labels])
+
+        y_tick_labels = []
+        for i in ax.get_yticks():
+            if i == float(0):
+                lab = '0'
+            else:
+                lab = f"{i/1000:.0f}"
+            y_tick_labels.append(lab)
+        ax.set_yticklabels(y_tick_labels)
+
+    if type(zones) == type(str()):
+        zones = [zones]
+
+    axs = []
+    fig = plt.figure(figsize=(15, 5))
+    axs.append(fig.add_subplot(2,3,1))
+    axs.append(fig.add_subplot(2,3,4))
+    axs.append(fig.add_subplot(2,3,3))
+    axs.append(fig.add_subplot(2,3,6))
+    axs.append(fig.add_subplot(1,3,2))
+
+    # Plot Fatalities
+    ax = axs[0]
+    compare_fatality_predictions(model_data, country_list=zones, ax=ax, verbose=False)
+    ax.set_ylabel("Daily deaths")
+    ax.get_legend().remove()
+    ax.set_xticklabels([])
+    ax.set_xlabel("")
+    _, ymax = ax.get_ylim()
+    # Plot Fatalities
+    ax = axs[1]
+    compare_fatality_predictions(model_data, country_list=zones, ax=ax, verbose=False)
+    put_legends_down(ax, ydown=-0.34)
+    ax.set_yscale('log')
+    ymin, _ = ax.get_ylim()
+    ax.set_ylim((0.5, ymax))
+    ax.set_ylabel("Daily deaths (log scale)")
+
+    # Plot Rt and interventions
+    ax = axs[2]
+    compare_rt_and_interventions(
+        model_data, country_list=zones, ax=ax, 
+        verbose=False, plot_forecast=False)
+
+    ax.minorticks_off()
+    ax.set_xticklabels([])
+    ax.tick_params(which='minor', label1On=False)
+    ax.set_xlabel("")
+    legends = put_legends_down(ax)
+    for legend in legends:
+        if ax.get_legend() != legend:
+            legend.remove()
+    plot_core.modify_legend(ax, loc='best')
+    ax.set_ylabel("$R_t$")
+    # Plot cases
+    ax = axs[3]
+    compare_case_predictions(
+        model_data, country_list=zones, ax=ax, 
+        verbose=False, plot_forecast=False)
+
+    put_legends_down(ax, ydown=-0.34)
+    ax.set_ylabel("Daily new cases (1000s)")
+    correct_ticklabels(ax)
+    
+    # Cumulated deaths
+    ax = axs[4]
+    compare_all_fatality_predictions(
+        model_data, country_list=zones, 
+        ax=ax, verbose=False, plot_forecast=False)
+    ax.set_ylabel("Total deaths (1000s)")
+    put_legends_down(ax, ydown=-0.17)
+    correct_ticklabels(ax)
+
+    return axs
