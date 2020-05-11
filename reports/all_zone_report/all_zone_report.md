@@ -28,7 +28,7 @@
 
  Latest simulation on data from  2020-04-30  with version  v3 
 
- ![img_file](img/Centre-Val de Loire_2020-04-30.png)
+ ![img_file](img/Centre-Val_de_Loire_2020-04-30.png)
 
 ### Corse 
 
@@ -58,7 +58,7 @@
 
  Latest simulation on data from  2020-04-30  with version  v3 
 
- ![img_file](img/Grand Est_2020-04-30.png)
+ ![img_file](img/Grand_Est_2020-04-30.png)
 
 ### Hauts-de-France 
 
@@ -88,13 +88,13 @@
 
  Latest simulation on data from  2020-04-30  with version  v3 
 
- ![img_file](img/Pays de la Loire_2020-04-30.png)
+ ![img_file](img/Pays_de_la_Loire_2020-04-30.png)
 
 ### Provence-Alpes-Côte d'Azur 
 
  Latest simulation on data from  2020-04-30  with version  v3 
 
- ![img_file](img/Provence-Alpes-Côte d'Azur_2020-04-30.png)
+ ![img_file](img/Provence-Alpes-Côte_d'Azur_2020-04-30.png)
 
 ### Île-de-France 
 
@@ -105,91 +105,91 @@
 ## Denmark
 ### Denmark - (country) 
 
- Latest simulation on data from  2020-04-28  with version  v3 
+ Latest simulation on data from  2020-04-30  with version  v3 
 
- ![img_file](img/Denmark_2020-04-28.png)
+ ![img_file](img/Denmark_2020-04-30.png)
 
 ## Italy
 ### Italy - (country) 
 
- Latest simulation on data from  2020-04-28  with version  v3 
+ Latest simulation on data from  2020-04-30  with version  v3 
 
- ![img_file](img/Italy_2020-04-28.png)
+ ![img_file](img/Italy_2020-04-30.png)
 
 ## Germany
 ### Germany - (country) 
 
- Latest simulation on data from  2020-04-28  with version  v3 
+ Latest simulation on data from  2020-04-30  with version  v3 
 
- ![img_file](img/Germany_2020-04-28.png)
+ ![img_file](img/Germany_2020-04-30.png)
 
 ## Spain
 ### Spain - (country) 
 
- Latest simulation on data from  2020-04-28  with version  v3 
+ Latest simulation on data from  2020-04-30  with version  v3 
 
- ![img_file](img/Spain_2020-04-28.png)
+ ![img_file](img/Spain_2020-04-30.png)
 
 ## United_Kingdom
 ### United_Kingdom - (country) 
 
- Latest simulation on data from  2020-04-28  with version  v3 
+ Latest simulation on data from  2020-04-30  with version  v3 
 
- ![img_file](img/United_Kingdom_2020-04-28.png)
+ ![img_file](img/United_Kingdom_2020-04-30.png)
 
 ## Norway
 ### Norway - (country) 
 
- Latest simulation on data from  2020-04-28  with version  v3 
+ Latest simulation on data from  2020-04-30  with version  v3 
 
- ![img_file](img/Norway_2020-04-28.png)
+ ![img_file](img/Norway_2020-04-30.png)
 
 ## Belgium
 ### Belgium - (country) 
 
- Latest simulation on data from  2020-04-28  with version  v3 
+ Latest simulation on data from  2020-04-30  with version  v3 
 
- ![img_file](img/Belgium_2020-04-28.png)
+ ![img_file](img/Belgium_2020-04-30.png)
 
 ## Austria
 ### Austria - (country) 
 
- Latest simulation on data from  2020-04-28  with version  v3 
+ Latest simulation on data from  2020-04-30  with version  v3 
 
- ![img_file](img/Austria_2020-04-28.png)
+ ![img_file](img/Austria_2020-04-30.png)
 
 ## Sweden
 ### Sweden - (country) 
 
- Latest simulation on data from  2020-04-28  with version  v3 
+ Latest simulation on data from  2020-04-30  with version  v3 
 
- ![img_file](img/Sweden_2020-04-28.png)
+ ![img_file](img/Sweden_2020-04-30.png)
 
 ## Switzerland
 ### Switzerland - (country) 
 
- Latest simulation on data from  2020-04-28  with version  v3 
+ Latest simulation on data from  2020-04-30  with version  v3 
 
- ![img_file](img/Switzerland_2020-04-28.png)
+ ![img_file](img/Switzerland_2020-04-30.png)
 
 ## Greece
 ### Greece - (country) 
 
- Latest simulation on data from  2020-04-28  with version  v3 
+ Latest simulation on data from  2020-04-30  with version  v3 
 
- ![img_file](img/Greece_2020-04-28.png)
+ ![img_file](img/Greece_2020-04-30.png)
 
 ## Portugal
 ### Portugal - (country) 
 
- Latest simulation on data from  2020-04-28  with version  v3 
+ Latest simulation on data from  2020-04-30  with version  v3 
 
- ![img_file](img/Portugal_2020-04-28.png)
+ ![img_file](img/Portugal_2020-04-30.png)
 
 ## Netherlands
 ### Netherlands - (country) 
 
- Latest simulation on data from  2020-04-28  with version  v3 
+ Latest simulation on data from  2020-04-30  with version  v3 
 
- ![img_file](img/Netherlands_2020-04-28.png)
+ ![img_file](img/Netherlands_2020-04-30.png)
 

@@ -370,9 +370,9 @@ def plot_case_forecast_country(
     """
     # Select the active columns
     active_columns = [
-        'estimated_cases_forecast_c',
-        'estimated_cases_forecast_min_c',
-        'estimated_cases_forecast_max_c',
+        'estimated_cases_forecast',
+        'estimated_cases_forecast_min',
+        'estimated_cases_forecast_max',
     ]
     plot_quantity = "Forecasted daily deaths"
     date_label = min(forecast_df["time"])
@@ -834,11 +834,12 @@ def plot_zones_summary(zones, model_data):
     ax.set_ylim((0.5, ymax))
     ax.set_ylabel("Daily deaths (log scale)")
 
+    plot_forecasts = True
     # Plot Rt and interventions
     ax = axs[2]
     compare_rt_and_interventions(
         model_data, country_list=zones, ax=ax, 
-        verbose=False, plot_forecast=False)
+        verbose=False, plot_forecast=plot_forecasts)
 
     ax.minorticks_off()
     ax.set_xticklabels([])
@@ -854,7 +855,7 @@ def plot_zones_summary(zones, model_data):
     ax = axs[3]
     compare_case_predictions(
         model_data, country_list=zones, ax=ax, 
-        verbose=False, plot_forecast=False)
+        verbose=False, plot_forecast=plot_forecasts)
 
     put_legends_down(ax, ydown=-0.34)
     ax.set_ylabel("Daily new cases (1000s)")
@@ -864,7 +865,7 @@ def plot_zones_summary(zones, model_data):
     ax = axs[4]
     compare_all_fatality_predictions(
         model_data, country_list=zones, 
-        ax=ax, verbose=False, plot_forecast=False)
+        ax=ax, verbose=False, plot_forecast=plot_forecasts)
     ax.set_ylabel("Total deaths (1000s)")
     put_legends_down(ax, ydown=-0.17)
     correct_yticklabels(ax)
