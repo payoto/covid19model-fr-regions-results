@@ -19,7 +19,7 @@ except Exception as e:
 type(error_pd_empty_plot)
 
 default_color_cycle = plt.rcParams['axes.prop_cycle']
-
+pd.plotting.register_matplotlib_converters()
 # 
 intervention_labels = {
     "lockdown" : "Lockdown",
@@ -95,17 +95,22 @@ def modify_legend(ax, **kwargs):
     copy_handles, copy_labels = get_current_legend_handles(ax)
     ax.legend(handles=copy_handles, labels=copy_labels, **kwargs)
 
-def axis_date_limits(ax, min_date=None, max_date=None, format_date=None):
+def axis_date_limits(axs, min_date=None, max_date=None, format_date=None):
+    if type(axs) != type(list()):
+        axs = [axs]
     # Tailor axis limits
-    try:
-        x_min, x_max = pd.to_datetime(ax.get_xlim(), unit='D')
-    except:
-        print("Warning: Failed to run `pd.to_datetime(ax.get_xlim(), unit='D')`")
+    for ax in axs:
+        try:
+            x_min, x_max = pd.to_datetime(ax.get_xlim(), unit='D')
+        except:
+            print("Warning: Failed to run `pd.to_datetime(ax.get_xlim(), unit='D')`")
+            print(f"{ax.get_xlim()} = ax.get_xlim() ; trying without unit")
+            x_min, x_max = pd.to_datetime(ax.get_xlim())
 
-    if not (max_date is None):
-        ax.set_xlim(right=min(x_max, pd.to_datetime(max_date, format=format_date)))
-    if not (min_date is None):
-        ax.set_xlim(left=max(x_min, pd.to_datetime(min_date, format=format_date)))
+        if not (max_date is None):
+            ax.set_xlim(right=min(x_max, pd.to_datetime(max_date, format=format_date)))
+        if not (min_date is None):
+            ax.set_xlim(left=max(x_min, pd.to_datetime(min_date, format=format_date)))
 
 def define_new_cycle(
     color_period=None,
@@ -300,7 +305,7 @@ def enable_time_series_plot(
         in_df[timeseries_field_out] = pd.to_datetime(
             in_df[timein_field],
             format=date_format
-        )
+        ).dt.to_period('D')
     return in_df
 
 
@@ -360,6 +365,9 @@ def plot_interventions_countries(
     # Input handling
     if ax is None:
         fig, ax = plt.subplots()
+        ax.xaxis_date()  # correctly setup x axis to be a date.
+        ax.xaxis.freq = "D"
+
     
     if prop_cycle is None:  # Define the default property cycle
         prop_cycle = cycler(
@@ -381,13 +389,7 @@ def plot_interventions_countries(
     # Define the correct color_cycle that will match the order of the trimmed
     # intervention list
     if color_cycle is None: 
-        trimmed_list = trimmed_interventions["country"].unique()
-        color_list = []
-        for i, country in enumerate(country_list):
-            if country in trimmed_list:
-                color_list.append(
-                    default_color_cycle.by_key()['color'][i]
-                )
+        color_list = _define_colors_of_interventions(trimmed_interventions, country_list)
         color_cyle = cycler(
             color=color_list
         )
@@ -407,7 +409,7 @@ def plot_interventions_countries(
     d_dict = {}
     # Plot the lines
     for i, row in trimmed_interventions.iterrows():
-        d = row["date"].value/(1000000000*60*60*24) # get it in fucking days
+        d = row["date"]
         try: # offset markers when multiple interventions happen on the same day
             d_dict[d] += 1
         except:
@@ -502,6 +504,34 @@ def compare_report_model_predictions(
 
     modify_legend(ax, bbox_to_anchor=(1.04, 1.0), loc='upper left')
     return ax
+
+def _define_colors_of_interventions(trimmed_interventions, zone_list):
+    """ Defines the correct colors to use based on the zone list and 
+    the unique interventions, to ensure:
+    1. That the country's color is used if it is present in zone_list
+    2. A single intervention is used for others
+    """
+    trimmed_list = {c: True for c in trimmed_interventions["country"].unique()}
+    zone_country_map = {
+        zone: row["country"] 
+            for _, row in trimmed_interventions.iterrows()
+                for zone in row["region"]
+    }
+    color_list = []
+    for i, zone in enumerate(zone_list):
+        if (
+            (zone in trimmed_list) or # the zone is a country
+            (
+                zone_country_map[zone] not in zone_country_map 
+                and trimmed_list[zone_country_map[zone]]
+            ) # or the country is not in the list of zones
+        ):
+            # Ensure a country's interventions are only plotted once
+            trimmed_list[zone_country_map[zone]] = False  
+            color_list.append(
+                default_color_cycle.by_key()['color'][i]
+            )
+    return color_list
 
 def find_unique_interventions(df_interventions, region_list):
     """ Given a list of regions returns a datafram similar to df_interventions

@@ -1,15 +1,27 @@
 import pandas as pd
 from matplotlib import pyplot as plt
-
+import matplotlib.dates as mdates
+import matplotlib.ticker as mticker
+from . import custom_formatter
 from . import plot_core
 
-def axis_date_limits(ax, min_date=None, max_date=None):
-    # Tailor axis limits
-    x_min, x_max = pd.to_datetime(ax.get_xlim(), unit='D')
-    if not (max_date is None):
-        ax.set_xlim(right=min(x_max, pd.to_datetime(max_date)))
-    if not (min_date is None):
-        ax.set_xlim(left=max(x_min, pd.to_datetime(min_date)))
+label_single_line_length = 40
+
+def default_label_generator(country, data_string, date_label):
+    
+    country_label = f"{country} ({data_string} {date_label})"
+    if len(country_label) > label_single_line_length:
+        data_label = f"({data_string} {date_label})"
+        if (
+            len(country) <= label_single_line_length 
+            and len(data_label) <= label_single_line_length
+        ):
+            country_label = country + "\n" + data_label
+        else:
+            print("Warning: Label too long, need to code contigency")
+            country_label = country + "\n" + data_label
+
+    return country_label
 
 # plots the fatalities
 
@@ -51,7 +63,7 @@ def plot_forecast_country(
     date_label = min(forecast_df["time"])
     
     if country_label is None:
-        country_label = f"{country} (forecast from {date_label})"
+        country_label = default_label_generator(country, "forecast from ", date_label)
     country_field = "country"
 
     return plot_core.plot_timeseries_confidence_interval_country(
@@ -92,7 +104,7 @@ def plot_model_country(
     date_label = max(model_df["time"])
     country_field="region"
     if country_label is None:
-        country_label = f"{country} (model to {date_label})"
+        country_label = default_label_generator(country, "model to ", date_label)
     
     return plot_core.plot_timeseries_confidence_interval_country(
         model_df,
@@ -132,7 +144,7 @@ def plot_report_country(
     date_label = max(model_df["time"])
     country_field="region"
     if country_label is None:
-        country_label = f"{country} (Reported deaths to {date_label})"
+        country_label = default_label_generator(country, "Reported deaths to ", date_label)
     
     return plot_core.plot_timeseries_country(
         model_df,
@@ -208,7 +220,7 @@ def plot_all_deaths_forecast_country(
     date_label = min(forecast_df["time"])
     
     if country_label is None:
-        country_label = f"{country} (forecast from {date_label})"
+        country_label = default_label_generator(country, "forecast from ", date_label)
     country_field = "country"
 
     return plot_core.plot_timeseries_confidence_interval_country(
@@ -249,7 +261,7 @@ def plot_all_deaths_model_country(
     date_label = max(model_df["time"])
     country_field="region"
     if country_label is None:
-        country_label = f"{country} (model to {date_label})"
+        country_label = default_label_generator(country, "model to ", date_label)
     
     return plot_core.plot_timeseries_confidence_interval_country(
         model_df,
@@ -289,7 +301,7 @@ def plot_all_deaths_report_country(
     date_label = max(model_df["time"])
     country_field="region"
     if country_label is None:
-        country_label = f"{country} (Reported deaths to {date_label})"
+        country_label = default_label_generator(country, "Reported deaths to ", date_label)
     
     return plot_core.plot_timeseries_country(
         model_df,
@@ -366,7 +378,7 @@ def plot_case_forecast_country(
     date_label = min(forecast_df["time"])
     
     if country_label is None:
-        country_label = f"{country} (forecast from {date_label})"
+        country_label = default_label_generator(country, "forecast from ", date_label)
     country_field = "country"
 
     return plot_core.plot_timeseries_confidence_interval_country(
@@ -407,7 +419,7 @@ def plot_case_model_country(
     date_label = max(model_df["time"])
     country_field="region"
     if country_label is None:
-        country_label = f"{country} (model to {date_label})"
+        country_label = default_label_generator(country, "model to ", date_label)
     
     return plot_core.plot_timeseries_confidence_interval_country(
         model_df,
@@ -447,7 +459,7 @@ def plot_case_report_country(
     date_label = max(model_df["time"])
     country_field="region"
     if country_label is None:
-        country_label = f"{country} (Reported cases to {date_label})"
+        country_label = default_label_generator(country, "Reported cases to ", date_label)
     
     return plot_core.plot_timeseries_country(
         model_df,
@@ -512,7 +524,7 @@ def plot_Rt_country(
     date_label = max(model_df["time"])
     country_field="region"
     if country_label is None:
-        country_label = f"{country} (model to {date_label})"
+        country_label = default_label_generator(country, "model to ", date_label)
     
     return plot_core.plot_timeseries_confidence_interval_country(
         model_df,
@@ -552,7 +564,7 @@ def plot_Rt_forecast_country(
     date_label = min(model_df["time"])
     country_field="country"
     if country_label is None:
-        country_label = f"{country} (forecast to {date_label})"
+        country_label = default_label_generator(country, "forecast to ", date_label)
     
     return plot_core.plot_timeseries_confidence_interval_country(
         model_df,
@@ -766,17 +778,32 @@ def plot_zones_summary(zones, model_data):
         
         return legends
 
-    def correct_ticklabels(ax):
-        ax.minorticks_off()    
-        ugly_xtick_labels = ax.xaxis.get_major_formatter().format_ticks(ax.get_xticks())
-        ax.set_xticklabels([i.strip("\n") for i in ugly_xtick_labels])
-
+    def correct_xticklabels(ax, disable_major):
+        ax.xaxis.set_minor_locator(mdates.WeekdayLocator(interval=1))
+        ax.xaxis.set_major_locator(mdates.MonthLocator(interval=1))
+        if disable_major:
+            ax.xaxis.set_major_formatter(mticker.NullFormatter())
+        else:
+            ax.xaxis.set_major_formatter(
+                custom_formatter.PandasToMpl_ConciseDateFormatter(
+                    mdates.MonthLocator(interval=1)
+                )
+            )
+        ax.xaxis.set_minor_formatter(mticker.NullFormatter())
+        # ax.xaxis.get_major_formatter()
+        # ax.set_minor_locator(mdates.WeekdayLocator(interval=1))  
+        # ugly_xtick_labels = ax.xaxis.get_major_formatter().format_ticks(ax.get_xticks())
+        # ax.set_xticklabels([i.strip("\n") for i in ugly_xtick_labels])
+    
+    def correct_yticklabels(ax):
         y_tick_labels = []
         for i in ax.get_yticks():
             if i == float(0):
                 lab = '0'
-            else:
+            elif abs(i)>4000:
                 lab = f"{i/1000:.0f}"
+            else:
+                lab = f"{i/1000:.1f}"
             y_tick_labels.append(lab)
         ax.set_yticklabels(y_tick_labels)
 
@@ -796,7 +823,6 @@ def plot_zones_summary(zones, model_data):
     compare_fatality_predictions(model_data, country_list=zones, ax=ax, verbose=False)
     ax.set_ylabel("Daily deaths")
     ax.get_legend().remove()
-    ax.set_xticklabels([])
     ax.set_xlabel("")
     _, ymax = ax.get_ylim()
     # Plot Fatalities
@@ -832,7 +858,7 @@ def plot_zones_summary(zones, model_data):
 
     put_legends_down(ax, ydown=-0.34)
     ax.set_ylabel("Daily new cases (1000s)")
-    correct_ticklabels(ax)
+    correct_yticklabels(ax)
     
     # Cumulated deaths
     ax = axs[4]
@@ -841,6 +867,8 @@ def plot_zones_summary(zones, model_data):
         ax=ax, verbose=False, plot_forecast=False)
     ax.set_ylabel("Total deaths (1000s)")
     put_legends_down(ax, ydown=-0.17)
-    correct_ticklabels(ax)
+    correct_yticklabels(ax)
+    for ax, disable_major in zip(axs, [True, False, True, False, False]):
+        correct_xticklabels(ax, disable_major=disable_major)
 
     return axs
