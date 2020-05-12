@@ -40,6 +40,7 @@ from .plot_core import (
     modify_legend,
     axis_date_limits,
     define_new_cycle,
+    define_color_cycler_from_map,
     default_color_cycle,
     plot_interventions_countries,
 )

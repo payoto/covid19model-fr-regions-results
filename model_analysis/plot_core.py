@@ -1,6 +1,7 @@
 import pandas as pd
 from matplotlib import pyplot as plt
 from matplotlib.rcsetup import cycler
+from matplotlib.colors import to_hex
 
 
 # Marks a confidence interval
@@ -51,6 +52,11 @@ def get_next_color(
         }
     line_color.remove()
     return dict_out
+
+def define_color_cycler_from_map(n, colormap=plt.cm.viridis):
+    return cycler(color=[
+        to_hex(colormap(float(i) / float(n))) for i in range(n)
+    ])
 
 def get_confidence_interval_lines(ax):
     ci_lines = []
