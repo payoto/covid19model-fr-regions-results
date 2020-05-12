@@ -16,11 +16,16 @@ try:
     pd.DataFrame().plot()
 except Exception as e:
     error_pd_empty_plot = e
-type(error_pd_empty_plot)
 
-default_color_cycle = plt.rcParams['axes.prop_cycle']
 pd.plotting.register_matplotlib_converters()
-# 
+# Module defaults can be configured after loading 
+default_color_cycle = plt.rcParams['axes.prop_cycle']
+default_plot_kwargs = {
+    "report": {'linestyle':'', 'markevery':1, 'marker': 'o', 'markersize':4},
+    "model": {},
+    "forecast": {'linestyle':'--'},
+}
+
 intervention_labels = {
     "lockdown" : "Lockdown",
     "public_events" : "Cancel events",
@@ -478,11 +483,7 @@ def compare_report_model_predictions(
         ax.set_prop_cycle(prop_cycle)
     
     # Get the correct precedence of keyword args
-    plot_kwargs = {
-        "report": {'linestyle':'', 'markevery':1, 'marker': 'o'},
-        "model": {},
-        "forecast": {'linestyle':'--'},
-    }
+    plot_kwargs = dict(default_plot_kwargs)
     for plot in plot_kwargs:
         for kwarg in kwargs:
             plot_kwargs[plot][kwarg] = kwargs[kwarg]

@@ -749,6 +749,7 @@ def compare_rt_and_interventions(
             data_dict["forecasting"], country_list=country_list,
             ax=ax, **plot_kwargs["forecast"])
     
+    ax.axhline(1, color='k', linestyle='--')
 
     # For clarity we remove the confidence intervals and the move the legend out
     if max_num_country_ci_display >= len(country_list):
@@ -871,5 +872,6 @@ def plot_zones_summary(zones, model_data):
     correct_yticklabels(ax)
     for ax, disable_major in zip(axs, [True, False, True, False, False]):
         correct_xticklabels(ax, disable_major=disable_major)
-
+        ax.grid(which="major")
+    
     return axs
