@@ -48,15 +48,17 @@ def get_next_color(
     y_min, y_max = ax_plot.get_ylim()
     line_color, = ax_plot.plot((x_min + x_max)/2, (y_min + y_max)/2)
     dict_out = {
-            prop: getattr(line_color, 'get_'+prop)() for prop in properties
-        }
+        prop: getattr(line_color, 'get_'+prop)() for prop in properties
+    }
     line_color.remove()
     return dict_out
+
 
 def define_color_cycler_from_map(n, colormap=plt.cm.viridis):
     return cycler(color=[
         to_hex(colormap(float(i) / float(n))) for i in range(n)
     ])
+
 
 def get_confidence_interval_lines(ax):
     ci_lines = []
@@ -65,33 +67,45 @@ def get_confidence_interval_lines(ax):
             is_ci_line = True
             for prop in confidence_interval_format:
                 is_ci_line &= (
-                    getattr(line,'get_' + prop)() 
+                    getattr(line, 'get_' + prop)()
                     == confidence_interval_format[prop]
                 )
             if is_ci_line:
                 ci_lines.append(line)
     return ci_lines
 
+
+def get_invalid_label_lines(ax):
+    ci_lines = []
+    for line in ax.get_lines():
+        if "_" == line.get_label()[:1]:
+            ci_lines.append(line)
+    return ci_lines
+
+
 def remove_confidence_interval_lines(ax):
     for line in get_confidence_interval_lines(ax):
         line.remove()
 
+
 def remove_confidence_interval_legend_labels(ax):
     ci_lines = get_confidence_interval_lines(ax)
+    ci_lines.extend(get_invalid_label_lines(ax))
     line_legend = [l for l in ax.get_lines() if l not in ci_lines]
     ax.legend(handles=line_legend)
+
 
 def get_current_legend_handles(ax):
     label_list = [t.get_text() for t in ax.get_legend().get_texts()]
     line_list = [l for l in ax.get_legend().get_lines()]
     handles, labels = ax.get_legend_handles_labels()
 
-    handler_map = ax.get_legend().get_legend_handler_map()
+    # handler_map = ax.get_legend().get_legend_handler_map()
 
     for handle, label in zip(handles, labels):
         if label in label_list:
             line_list[label_list.index(label)] = handle
-    
+
     return line_list, label_list
 
 def add_lines_to_legend(ax, handles, labels=None):
@@ -390,7 +404,7 @@ def plot_interventions_countries(
         raise ValueError("`color` and `color_cycle` cannot be both specified.")
     
     if color is not None:
-        color_cyle = cycler(color = [color])
+        color_cycle = cycler(color=[color])
 
     # Trim the list of interventions to only the relevant ones
     trimmed_interventions = find_unique_interventions(
@@ -401,13 +415,13 @@ def plot_interventions_countries(
     # intervention list
     if color_cycle is None: 
         color_list = _define_colors_of_interventions(trimmed_interventions, country_list)
-        color_cyle = cycler(
+        color_cycle = cycler(
             color=color_list
         )
 
     # Set the property cycle
     try:
-        ax.set_prop_cycle(prop_cycle * color_cyle)
+        ax.set_prop_cycle(prop_cycle * color_cycle)
     except Exception as e:
         print(prop_cycle)
         print(color_cycle)
@@ -555,7 +569,8 @@ def find_unique_interventions(df_interventions, region_list):
     trimmed_interventions = []
 
     for group_val, group in grouped_interventions:
-        trimmed_interventions.append(group.iloc[0, ])
-        trimmed_interventions[-1]["region"] = group["region"].unique()
+        new_group = group.iloc[0, ].copy()
+        new_group.loc["region"] = group["region"].unique()
+        trimmed_interventions.append(new_group)
 
     return pd.DataFrame(trimmed_interventions)

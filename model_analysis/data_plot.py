@@ -811,6 +811,13 @@ def plot_zones_summary(zones, model_data):
     if type(zones) == type(str()):
         zones = [zones]
 
+    if len(zones) == 1:
+        plot_specific_kwargs = {
+            "interventions": {
+                'color': 'k',
+            }
+        }
+
     axs = []
     fig = plt.figure(figsize=(15, 5))
     axs.append(fig.add_subplot(2,3,1))
@@ -821,14 +828,20 @@ def plot_zones_summary(zones, model_data):
 
     # Plot Fatalities
     ax = axs[0]
-    compare_fatality_predictions(model_data, country_list=zones, ax=ax, verbose=False)
+    compare_fatality_predictions(
+        model_data, country_list=zones, ax=ax, verbose=False
+    )
+
     ax.set_ylabel("Daily deaths")
     ax.get_legend().remove()
     ax.set_xlabel("")
     _, ymax = ax.get_ylim()
     # Plot Fatalities
     ax = axs[1]
-    compare_fatality_predictions(model_data, country_list=zones, ax=ax, verbose=False)
+    compare_fatality_predictions(
+        model_data, country_list=zones, ax=ax, verbose=False
+    )
+
     put_legends_down(ax, ydown=-0.34)
     ax.set_yscale('log')
     ymin, _ = ax.get_ylim()
@@ -840,7 +853,8 @@ def plot_zones_summary(zones, model_data):
     ax = axs[2]
     compare_rt_and_interventions(
         model_data, country_list=zones, ax=ax, 
-        verbose=False, plot_forecast=plot_forecasts)
+        verbose=False, plot_forecast=plot_forecasts,
+        plot_specific_kwargs=plot_specific_kwargs)
 
     ax.minorticks_off()
     ax.set_xticklabels([])
