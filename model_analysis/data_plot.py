@@ -811,6 +811,7 @@ def plot_zones_summary(zones, model_data):
     if type(zones) == type(str()):
         zones = [zones]
 
+    plot_specific_kwargs = {}
     if len(zones) == 1:
         plot_specific_kwargs = {
             "interventions": {
@@ -887,5 +888,5 @@ def plot_zones_summary(zones, model_data):
     for ax, disable_major in zip(axs, [True, False, True, False, False]):
         correct_xticklabels(ax, disable_major=disable_major)
         ax.grid(which="major")
-    
+    axs[1].grid(which="both", axis="y")
     return axs

@@ -22,7 +22,7 @@ pd.plotting.register_matplotlib_converters()
 # Module defaults can be configured after loading 
 default_color_cycle = plt.rcParams['axes.prop_cycle']
 default_plot_kwargs = {
-    "report": {'linestyle':'', 'markevery':1, 'marker': 'o', 'markersize':4},
+    "report": {'linestyle':'', 'markevery':1, 'marker': 'o', 'markersize':3},
     "model": {},
     "forecast": {'linestyle':'--'},
 }
