@@ -45,7 +45,12 @@ from .plot_core import (
     plot_interventions_countries,
 )
 
+from .translate import (
+    translate_axes_to_french,
+)
+
 from . import data_plot as icl_plot
 from . import plot_core as icl_plot_core
 from . import data_load as icl_load
+from . import translate as icl_translate
                     

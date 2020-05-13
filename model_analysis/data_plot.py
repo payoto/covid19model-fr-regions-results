@@ -710,7 +710,7 @@ def compare_rt_and_interventions(
     ax=None,
     prop_cycle=None,
     max_num_country_ci_display=3,
-    plot_specific_kwargs={},
+    plot_specific_kwargs=None,
     plot_forecast=True,
     **kwargs
 ):
@@ -726,7 +726,8 @@ def compare_rt_and_interventions(
         )
     if ax is None:
         _, ax = plt.subplots()
-        ax.set_prop_cycle(prop_cycle)
+
+    ax.set_prop_cycle(prop_cycle)
     
     # Get the correct precedence of keyword args
     plot_kwargs = {
@@ -734,12 +735,11 @@ def compare_rt_and_interventions(
         "model": {},
         "forecast": {'linestyle':'--'},
     }
-    for plot in plot_kwargs:
-        for kwarg in kwargs:
-            plot_kwargs[plot][kwarg] = kwargs[kwarg]
-    for plot in plot_specific_kwargs:
-        for kwarg in plot_specific_kwargs[plot]:
-            plot_kwargs[plot][kwarg] = plot_specific_kwargs[plot][kwarg]
+    if plot_specific_kwargs is None:
+        plot_specific_kwargs = {}
+
+    plot_kwargs = plot_core.combine_keyword_args_dict(
+        plot_specific_kwargs, kwargs, plot_kwargs)
 
     # Plot the data (the reported data without any line, and with a marker every time)
     plot_Rt_countries(data_dict["modelling"], country_list=country_list,
@@ -763,7 +763,7 @@ def compare_rt_and_interventions(
 
     return ax
 
-def plot_zones_summary(zones, model_data):
+def plot_zones_summary(zones, model_data, plot_specific_kwargs=None):
     """Plots the summary for a zone or zones
     
     This summary plot has 5 plots, with daily and cumulated deaths
@@ -810,17 +810,26 @@ def plot_zones_summary(zones, model_data):
 
     if type(zones) == type(str()):
         zones = [zones]
-
-    plot_specific_kwargs = {}
+    
+    
     if len(zones) == 1:
         plot_specific_kwargs = {
             "interventions": {
                 'color': 'k',
-            }
+            },
+            "report": {
+                'color': 'C3',
+            },
+            "model": {
+                'color': 'C0',
+            },
+            "forecast": {
+                'color': 'C1',
+            },
         }
-
     axs = []
     fig = plt.figure(figsize=(15, 5))
+    fig.subplots_adjust(top=0.8, wspace=0.3)
     axs.append(fig.add_subplot(2,3,1))
     axs.append(fig.add_subplot(2,3,4))
     axs.append(fig.add_subplot(2,3,3))
@@ -830,7 +839,8 @@ def plot_zones_summary(zones, model_data):
     # Plot Fatalities
     ax = axs[0]
     compare_fatality_predictions(
-        model_data, country_list=zones, ax=ax, verbose=False
+        model_data, country_list=zones, ax=ax, verbose=False,
+        plot_specific_kwargs=plot_specific_kwargs
     )
 
     ax.set_ylabel("Daily deaths")
@@ -840,7 +850,8 @@ def plot_zones_summary(zones, model_data):
     # Plot Fatalities
     ax = axs[1]
     compare_fatality_predictions(
-        model_data, country_list=zones, ax=ax, verbose=False
+        model_data, country_list=zones, ax=ax, verbose=False,
+        plot_specific_kwargs=plot_specific_kwargs
     )
 
     put_legends_down(ax, ydown=-0.34)
@@ -871,7 +882,8 @@ def plot_zones_summary(zones, model_data):
     ax = axs[3]
     compare_case_predictions(
         model_data, country_list=zones, ax=ax, 
-        verbose=False, plot_forecast=plot_forecasts)
+        verbose=False, plot_forecast=plot_forecasts,
+        plot_specific_kwargs=plot_specific_kwargs)
 
     put_legends_down(ax, ydown=-0.34)
     ax.set_ylabel("Daily new cases (1000s)")
@@ -881,12 +893,41 @@ def plot_zones_summary(zones, model_data):
     ax = axs[4]
     compare_all_fatality_predictions(
         model_data, country_list=zones, 
-        ax=ax, verbose=False, plot_forecast=plot_forecasts)
+        ax=ax, verbose=False, plot_forecast=plot_forecasts,
+        plot_specific_kwargs=plot_specific_kwargs)
     ax.set_ylabel("Total deaths (1000s)")
-    put_legends_down(ax, ydown=-0.17)
+    put_legends_down(ax, ydown=-0.16)
     correct_yticklabels(ax)
     for ax, disable_major in zip(axs, [True, False, True, False, False]):
         correct_xticklabels(ax, disable_major=disable_major)
         ax.grid(which="major")
+    
+    fig.align_ylabels(axs=axs[0:2])
+    fig.align_ylabels(axs=axs[2:4])
     axs[1].grid(which="both", axis="y")
+
+    axs[0].set_title("Plots of daily fatalities")
+    axs[4].set_title("Plots of cumulated fatalities")
+    axs[2].set_title(
+        "Progression of the epidemic:\n reproduction number and infections"
+    )
+    
+    axs[0].figure.suptitle(
+        "Comparing COVID-19 reported, modeled and predicted deaths\nfor "
+        + plot_core.zones_to_string(zones),
+         fontsize=16, fontweight="bold"
+    )
+    val_min_y = plot_core.get_lowest_figure_coord(axs)
+
+    fig.text(0.08, val_min_y-0.1, 
+        (
+            "Data sources: SPF, ECDC, INSEE ; Model: github.com/payoto/covid19model"
+            + "\n" +
+            "Visualisation: Alexandre Payot (Data against covid-19)"
+        ),
+        ha="left",
+        verticalalignment="bottom",
+    )
+    plt.draw()
+    
     return axs
