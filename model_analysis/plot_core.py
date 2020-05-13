@@ -1,8 +1,8 @@
+from copy import deepcopy
 import pandas as pd
 from matplotlib import pyplot as plt
 from matplotlib.rcsetup import cycler
 from matplotlib.colors import to_hex
-
 
 # Marks a confidence interval
 _ci_mark = "CI_"
@@ -185,6 +185,55 @@ def define_new_cycle(
         )
 
     return prop_cycle_sized
+
+def combine_keyword_args_dict(priority_kwargs_dict, kwargs, default_kwargs_dict):
+    """ Combines keyword arguments with the correct precedence
+    
+    """
+    kwargs_dict = deepcopy(default_kwargs_dict)
+    for plot in kwargs_dict:
+        for kwarg in kwargs:
+            kwargs_dict[plot][kwarg] = kwargs[kwarg]
+    for plot in priority_kwargs_dict:
+        if plot in kwargs_dict: # sometimes plot specific can have extra info
+            for kwarg in priority_kwargs_dict[plot]:
+                kwargs_dict[plot][kwarg] = priority_kwargs_dict[plot][kwarg]
+    
+    return kwargs_dict
+
+def zones_to_string(zones):
+        if type(zones) == type(str):
+            return zones
+        try:
+            str_zones = zones[0]
+        except IndexError as identifier:
+            raise ValueError("zones must be a list of strings of len >= 1")
+        
+        if len(zones) == 1:
+            return str_zones
+
+        for i in range(1, len(zones) - 1):
+            str_zones += ', ' + zones[i]
+        
+        str_zones += ' and ' + zones[-1]
+        return str_zones
+
+
+def get_lowest_figure_coord(axs):
+    plt.draw()
+    val_min_y = 0
+    for ax in axs:
+        transform_2_figure = ax.figure.transFigure.inverted().transform
+        leg = ax.get_legend()
+        if leg:
+            try:
+                window = leg.get_window_extent()
+                bottom_edge = (window.x0, window.y0)
+                val_min_y = min(val_min_y, transform_2_figure(bottom_edge)[1])
+            except AttributeError as identifier:
+                print("Failed to get legend limits")
+    return val_min_y
+
 
 def plot_timeseries_confidence_interval_country(
     forecast_df,
@@ -485,7 +534,7 @@ def compare_report_model_predictions(
     ax=None,
     prop_cycle=None,
     max_num_country_ci_display=3,
-    plot_specific_kwargs={},
+    plot_specific_kwargs=None,
     plot_forecast=True,
     **kwargs
 ):
@@ -506,13 +555,10 @@ def compare_report_model_predictions(
         ax.set_prop_cycle(prop_cycle)
     
     # Get the correct precedence of keyword args
-    plot_kwargs = dict(default_plot_kwargs)
-    for plot in plot_kwargs:
-        for kwarg in kwargs:
-            plot_kwargs[plot][kwarg] = kwargs[kwarg]
-    for plot in plot_specific_kwargs:
-        for kwarg in plot_specific_kwargs[plot]:
-            plot_kwargs[plot][kwarg] = plot_specific_kwargs[plot][kwarg]
+    if plot_specific_kwargs is None:
+        plot_specific_kwargs = {}
+    plot_kwargs = combine_keyword_args_dict(
+        plot_specific_kwargs, kwargs, default_plot_kwargs)
 
     # Plot the data (the reported data without any line, and with a marker every time)
     compare_func(
