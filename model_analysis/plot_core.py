@@ -21,6 +21,7 @@ except Exception as e:
 pd.plotting.register_matplotlib_converters()
 # Module defaults can be configured after loading 
 default_color_cycle = plt.rcParams['axes.prop_cycle']
+default_color_map = plt.cm.viridis
 default_plot_kwargs = {
     "report": {'linestyle':'', 'markevery':1, 'marker': 'o', 'markersize':3},
     "model": {},
@@ -54,7 +55,9 @@ def get_next_color(
     return dict_out
 
 
-def define_color_cycler_from_map(n, colormap=plt.cm.viridis):
+def define_color_cycler_from_map(n, colormap=None):
+    if colormap is None:
+        colormap = default_color_map
     return cycler(color=[
         to_hex(colormap(float(i) / float(n))) for i in range(n)
     ])
