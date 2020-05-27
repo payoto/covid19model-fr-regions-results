@@ -11,3 +11,4 @@
 "intervention_source","interventions"
 "formula_pooling","~ -1 + residential + transit + averageMobility"
 "formula_partialpooling","~ -1 + residential + transit + averageMobility"
+"mobilityprocessing","none"
