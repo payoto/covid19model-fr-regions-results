@@ -1,6 +1,4 @@
 folder  ,  version ,  last available data ,  number of countries  ,  number of zones  
-./runs/base-mobility-fullrun-20200527T230727-3790666  ,  v5 ,  1  ,  16 ,  "France";  
-./runs/base-mobility-fullrun-20200527T230846-3790664  ,  v5 ,  14  ,  30 ,  "Austria"; "Belgium"; "Denmark"; "France"; "Germany"; "Greece"; "Italy"; "Netherlands"; "Norway"; "Portugal"; "Spain"; "Sweden"; "Switzerland"; "United_Kingdom";  
 ./runs/base-mobility-fullrun-20200527T230708-3790666  ,  v5 ,  2020-03-24  ,  1  ,  14 
 ./runs/base-mobility-fullrun-20200528T223059-3792704  ,  v5 ,  2020-03-24  ,  1  ,  14 
 ./runs/base-fullrun-20200423T024310-3636909  ,  v2 ,  2020-03-24  ,  1  ,  15 
