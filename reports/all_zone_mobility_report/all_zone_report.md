@@ -1,11 +1,35 @@
 # Country reports
-## France
-### France - (country) 
+# Rapport de simulation sur la progression et l'impact du COVID19 en France
+
+## Résultats au niveau France
+
+Dans cette section vous retrouverez des délimitations non géographiquesde la population
+
+### France 
 
  Latest simulation on data from 2020-05-28 with version v5 
 
  ![img_file](img/France_2020-05-28.png)
 
+### France-EHPAD 
+
+ Latest simulation on data from 2020-05-28 with version v5 
+
+ ![img_file](img/France-EHPAD_2020-05-28.png)
+
+### France-OC19 
+
+ Latest simulation on data from 2020-05-28 with version v5 
+
+ ![img_file](img/France-OC19_2020-05-28.png)
+
+### France-hopitaux 
+
+ Latest simulation on data from 2020-05-28 with version v5 
+
+ ![img_file](img/France-hopitaux_2020-05-28.png)
+
+## Résultats régionaux en France
 ### Auvergne-Rhône-Alpes 
 
  Latest simulation on data from 2020-05-28 with version v5 
@@ -35,24 +59,6 @@
  Latest simulation on data from 2020-05-28 with version v5 
 
  ![img_file](img/Corse_2020-05-28.png)
-
-### France-EHPAD 
-
- Latest simulation on data from 2020-05-28 with version v5 
-
- ![img_file](img/France-EHPAD_2020-05-28.png)
-
-### France-OC19 
-
- Latest simulation on data from 2020-05-28 with version v5 
-
- ![img_file](img/France-OC19_2020-05-28.png)
-
-### France-hopitaux 
-
- Latest simulation on data from 2020-05-28 with version v5 
-
- ![img_file](img/France-hopitaux_2020-05-28.png)
 
 ### Grand Est 
 
@@ -102,92 +108,157 @@
 
  ![img_file](img/Île-de-France_2020-05-28.png)
 
-## Denmark
-### Denmark - (country) 
+# Rapport de simulation sur la progression et l'impact du COVID19 en Denmark
+
+## Résultats au niveau Denmark
+
+Dans cette section vous retrouverez des délimitations non géographiquesde la population
+
+### Denmark 
 
  Latest simulation on data from 2020-05-28 with version v5 
 
  ![img_file](img/Denmark_2020-05-28.png)
 
-## Italy
-### Italy - (country) 
+# Rapport de simulation sur la progression et l'impact du COVID19 en Italy
+
+## Résultats au niveau Italy
+
+Dans cette section vous retrouverez des délimitations non géographiquesde la population
+
+### Italy 
 
  Latest simulation on data from 2020-05-28 with version v5 
 
  ![img_file](img/Italy_2020-05-28.png)
 
-## Germany
-### Germany - (country) 
+# Rapport de simulation sur la progression et l'impact du COVID19 en Germany
+
+## Résultats au niveau Germany
+
+Dans cette section vous retrouverez des délimitations non géographiquesde la population
+
+### Germany 
 
  Latest simulation on data from 2020-05-28 with version v5 
 
  ![img_file](img/Germany_2020-05-28.png)
 
-## Spain
-### Spain - (country) 
+# Rapport de simulation sur la progression et l'impact du COVID19 en Spain
+
+## Résultats au niveau Spain
+
+Dans cette section vous retrouverez des délimitations non géographiquesde la population
+
+### Spain 
 
  Latest simulation on data from 2020-05-28 with version v5 
 
  ![img_file](img/Spain_2020-05-28.png)
 
-## United_Kingdom
-### United_Kingdom - (country) 
+# Rapport de simulation sur la progression et l'impact du COVID19 en United_Kingdom
+
+## Résultats au niveau United_Kingdom
+
+Dans cette section vous retrouverez des délimitations non géographiquesde la population
+
+### United_Kingdom 
 
  Latest simulation on data from 2020-05-28 with version v5 
 
  ![img_file](img/United_Kingdom_2020-05-28.png)
 
-## Norway
-### Norway - (country) 
+# Rapport de simulation sur la progression et l'impact du COVID19 en Norway
+
+## Résultats au niveau Norway
+
+Dans cette section vous retrouverez des délimitations non géographiquesde la population
+
+### Norway 
 
  Latest simulation on data from 2020-05-28 with version v5 
 
  ![img_file](img/Norway_2020-05-28.png)
 
-## Belgium
-### Belgium - (country) 
+# Rapport de simulation sur la progression et l'impact du COVID19 en Belgium
+
+## Résultats au niveau Belgium
+
+Dans cette section vous retrouverez des délimitations non géographiquesde la population
+
+### Belgium 
 
  Latest simulation on data from 2020-05-28 with version v5 
 
  ![img_file](img/Belgium_2020-05-28.png)
 
-## Austria
-### Austria - (country) 
+# Rapport de simulation sur la progression et l'impact du COVID19 en Austria
+
+## Résultats au niveau Austria
+
+Dans cette section vous retrouverez des délimitations non géographiquesde la population
+
+### Austria 
 
  Latest simulation on data from 2020-05-28 with version v5 
 
  ![img_file](img/Austria_2020-05-28.png)
 
-## Sweden
-### Sweden - (country) 
+# Rapport de simulation sur la progression et l'impact du COVID19 en Sweden
+
+## Résultats au niveau Sweden
+
+Dans cette section vous retrouverez des délimitations non géographiquesde la population
+
+### Sweden 
 
  Latest simulation on data from 2020-05-28 with version v5 
 
  ![img_file](img/Sweden_2020-05-28.png)
 
-## Switzerland
-### Switzerland - (country) 
+# Rapport de simulation sur la progression et l'impact du COVID19 en Switzerland
+
+## Résultats au niveau Switzerland
+
+Dans cette section vous retrouverez des délimitations non géographiquesde la population
+
+### Switzerland 
 
  Latest simulation on data from 2020-05-28 with version v5 
 
  ![img_file](img/Switzerland_2020-05-28.png)
 
-## Greece
-### Greece - (country) 
+# Rapport de simulation sur la progression et l'impact du COVID19 en Greece
+
+## Résultats au niveau Greece
+
+Dans cette section vous retrouverez des délimitations non géographiquesde la population
+
+### Greece 
 
  Latest simulation on data from 2020-05-28 with version v5 
 
  ![img_file](img/Greece_2020-05-28.png)
 
-## Portugal
-### Portugal - (country) 
+# Rapport de simulation sur la progression et l'impact du COVID19 en Portugal
+
+## Résultats au niveau Portugal
+
+Dans cette section vous retrouverez des délimitations non géographiquesde la population
+
+### Portugal 
 
  Latest simulation on data from 2020-05-28 with version v5 
 
  ![img_file](img/Portugal_2020-05-28.png)
 
-## Netherlands
-### Netherlands - (country) 
+# Rapport de simulation sur la progression et l'impact du COVID19 en Netherlands
+
+## Résultats au niveau Netherlands
+
+Dans cette section vous retrouverez des délimitations non géographiquesde la population
+
+### Netherlands 
 
  Latest simulation on data from 2020-05-28 with version v5 
 
