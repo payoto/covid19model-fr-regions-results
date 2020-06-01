@@ -31,6 +31,11 @@ from .data_plot import (
     plot_case_report_countries,
     plot_case_model_countries,
     plot_daily_cases_countries,
+    plot_group_Rt,
+    plot_group_deaths,
+    plot_mobility,
+    plot_group,
+    plot_groups,
 )
 
 from .plot_core import (

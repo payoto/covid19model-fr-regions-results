@@ -2,6 +2,7 @@ import pandas as pd
 from matplotlib import pyplot as plt
 import matplotlib.dates as mdates
 import matplotlib.ticker as mticker
+from numpy import where
 from . import custom_formatter
 from . import plot_core
 
@@ -931,3 +932,95 @@ def plot_zones_summary(zones, model_data, plot_specific_kwargs=None):
     plt.draw()
     
     return axs
+
+
+
+def plot_group_Rt(group, country, prop_cycle, ax=None, min_date=None, max_date=None):
+    if ax is None:
+        _, ax = plt.subplots()
+    ax.set_title(f"Rt {group[0][0]} - fitting {group[0][1]}")
+    # Define Standard keyworded arguments
+    standard_kwargs = {
+        "ax": ax,
+        "verbose": False,
+    }
+
+    color_cycle = plot_core.define_color_cycler_from_map(group[1].shape[0])
+    # For every row of each group plot the model and forecast in the same colour.
+    ax.set_prop_cycle(color_cycle*prop_cycle)
+    for row in group[1].iterrows():
+        model = row[1]["model"]
+        plot_Rt_country(model.data["modelling"], country, **standard_kwargs)
+        plot_Rt_forecast_country(
+            model.data["forecasting"], country, **standard_kwargs)
+    # Plot data for longest data stream
+    plot_core.remove_confidence_interval_legend_labels(ax)
+    plot_core.modify_legend(ax, bbox_to_anchor=(1.04, 0.7), loc='upper left')
+    model = group[1].iloc[-1]["model"]
+    plot_core.plot_interventions_countries(
+        model.data["interventions"], [country], ax=ax,
+        color='k',markevery=1)
+    # Format plots
+    # ax.axhline(1,color='k')
+    ax.grid(which="major")
+    plot_core.axis_date_limits(ax, min_date=min_date, max_date=max_date)
+
+def plot_group_deaths(group, country, prop_cycle, ax=None, min_date=None, max_date=None):
+    if ax is None:
+        _, ax = plt.subplots()
+    ax.set_title(f"model {group[0][0]} - fitting {group[0][1]}")
+    # Define Standard keyworded arguments
+    standard_kwargs = {
+        "ax": ax,
+        "verbose": False,
+    }
+    # Plot data for longest data stream
+    model = group[1].iloc[-1]["model"]
+    plot_report_country(model.data["modelling"], country, 
+        color='k', marker='o', markevery=1, linestyle='none', **standard_kwargs)
+    color_cycle = plot_core.define_color_cycler_from_map(group[1].shape[0])
+    # For every row of each group plot the model and forecast in the same colour.
+    ax.set_prop_cycle(color_cycle*prop_cycle)
+    for row in group[1].iterrows():
+        model = row[1]["model"]
+        plot_model_country(model.data["modelling"], country, **standard_kwargs)
+        plot_forecast_country(model.data["forecasting"], country, **standard_kwargs)
+    # Format plots
+    plot_core.remove_confidence_interval_legend_labels(ax)
+    plot_core.modify_legend(ax, bbox_to_anchor=(0.2, -0.1), loc='upper left')
+    ax.set_ylim(1, 10000)
+    ax.set_yscale('log')
+    ax.grid(which="major")
+
+    plot_core.axis_date_limits(ax, min_date=min_date, max_date=max_date)
+
+def plot_mobility(group, country, ax):
+    #ax.set_title(f"Processed Mobility {group[0][0]} - fitting {group[0][1]}")
+    max_iloc = (where(max(group[1]["last available data"]) == group[1]["last available data"])[0][0])
+    mob_df = group[1].iloc[max_iloc].model.data["mobility"]
+    mob_df[mob_df["country"] == country].plot(
+        x="date", y=["parks", "grocery.pharmacy", "residential", "workplace", "retail.recreation"],
+        ax=ax
+    )
+
+def plot_group(group, country, prop_cycle, min_date=None, max_date=None):
+    fig = plt.figure(constrained_layout=True)
+    fig.set_size_inches(15,7)
+    gs = fig.add_gridspec(5, 2)
+    axs = []
+    axs.append(fig.add_subplot(gs[0:3, 0]))
+    axs.append(fig.add_subplot(gs[0:3, 1]))
+    axs.append(fig.add_subplot(gs[3:, :]))
+    fig.suptitle(f"{country} : {group[0]}")
+    plot_group_Rt(group, country, prop_cycle, ax=axs[1], min_date=min_date, max_date=max_date)
+    plot_group_deaths(group, country, prop_cycle, ax=axs[0], min_date=min_date, max_date=max_date)
+    axs[0].get_legend().remove()
+    plot_mobility(group, country, axs[2])
+    return axs
+    
+def plot_groups(groups, country, prop_cycle, cond_group=lambda x: True, min_date='2020-02-10', max_date='2020-06-15'):
+    for i, group in enumerate(groups):
+        if not cond_group(group[0]):
+            continue
+        print(f"Plotting group {i + 1} of {len(groups)}: {group[0]}")
+        plot_group(group, country, prop_cycle, min_date, max_date)
