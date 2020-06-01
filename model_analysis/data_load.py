@@ -108,12 +108,30 @@ class Model_Folder(object):
         if data_category is None:
             for file in self.files:
                 self.data[file] = pd.read_csv(self.files[file])
-        elif type(data_category) == type(list()):
+            data_categories = [file for file in self.files]
+
+        elif isinstance(data_category, list()):
             for file in data_category:
                 self.data[file] = pd.read_csv(self.files[file])
-        elif type(data_category) == type(str()):
-            self.data[data_category] = pd.read_csv(self.files[data_category])
-        else:
-            raise AttributeError(f"Unknown data_category format of type {type(data_category)}")
+            data_categories = data_category
 
+        elif isinstance(data_category, str()):
+            self.data[data_category] = pd.read_csv(self.files[data_category])
+            data_categories = [data_category]
+
+        else:
+            raise AttributeError(
+                f"Unknown data_category format of type {type(data_category)}")
+
+        self._process_data(data_categories)
+
+    def _process_data(self, data_categories):
+        for data_category in data_categories:
+
+            if data_category == "arguments":
+                df_args = self.data[data_category]
+                self.data[data_category] = {
+                    row.iloc[0]: row.iloc[1]
+                    for i, (_, row) in enumerate(df_args.iterrows())
+                }
 
