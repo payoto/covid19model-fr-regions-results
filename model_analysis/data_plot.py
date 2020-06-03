@@ -1020,9 +1020,14 @@ def plot_group(group, country, prop_cycle, min_date=None, max_date=None):
     plot_mobility(group, country, axs[2])
     return axs
     
-def plot_groups(groups, country, prop_cycle, cond_group=lambda x: True, min_date='2020-02-10', max_date='2020-06-15'):
+def plot_groups(
+    groups, country, prop_cycle, cond_group=lambda x: True, 
+    min_date='2020-02-10', max_date='2020-06-15',
+    verbose=True,
+):
     for i, group in enumerate(groups):
         if not cond_group(group[0]):
             continue
-        print(f"Plotting group {i + 1} of {len(groups)}: {group[0]}")
+        if verbose:
+            print(f"Plotting group {i + 1} of {len(groups)}: {group[0]}")
         plot_group(group, country, prop_cycle, min_date, max_date)
