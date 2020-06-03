@@ -961,7 +961,7 @@ def plot_group_Rt(group, country, prop_cycle, ax=None, min_date=None, max_date=N
         model.data["interventions"], [country], ax=ax,
         color='k',markevery=1)
     # Format plots
-    # ax.axhline(1,color='k')
+    ax.axhline(1, color='k', linestyle='--')
     ax.grid(which="major")
     plot_core.axis_date_limits(ax, min_date=min_date, max_date=max_date)
 
@@ -1002,6 +1002,8 @@ def plot_mobility(group, country, ax):
         x="date", y=["parks", "grocery.pharmacy", "residential", "workplace", "retail.recreation"],
         ax=ax
     )
+    ax.axhline(0, color='k', linestyle='--')
+    ax.grid(which="major")
 
 def plot_group(group, country, prop_cycle, min_date=None, max_date=None):
     fig = plt.figure(constrained_layout=True)
