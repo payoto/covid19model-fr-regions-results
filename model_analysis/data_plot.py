@@ -1005,19 +1005,30 @@ def plot_mobility(group, country, ax):
     ax.axhline(0, color='k', linestyle='--')
     ax.grid(which="major")
 
-def plot_group(group, country, prop_cycle, min_date=None, max_date=None):
+def plot_group(
+    group, country, prop_cycle,
+    min_date=None, max_date=None,
+    regroup=["last available data"]
+):
+
+    processed_group = (
+        group[0], 
+        group[1].groupby(by=regroup).first().reset_index()
+    )
+
     fig = plt.figure(constrained_layout=True)
     fig.set_size_inches(15,7)
     gs = fig.add_gridspec(5, 2)
+
     axs = []
     axs.append(fig.add_subplot(gs[0:3, 0]))
     axs.append(fig.add_subplot(gs[0:3, 1]))
     axs.append(fig.add_subplot(gs[3:, :]))
-    fig.suptitle(f"{country} : {group[0]}")
-    plot_group_Rt(group, country, prop_cycle, ax=axs[1], min_date=min_date, max_date=max_date)
-    plot_group_deaths(group, country, prop_cycle, ax=axs[0], min_date=min_date, max_date=max_date)
+    fig.suptitle(f"{country} : {processed_group[0]}")
+    plot_group_Rt(processed_group, country, prop_cycle, ax=axs[1], min_date=min_date, max_date=max_date)
+    plot_group_deaths(processed_group, country, prop_cycle, ax=axs[0], min_date=min_date, max_date=max_date)
     axs[0].get_legend().remove()
-    plot_mobility(group, country, axs[2])
+    plot_mobility(processed_group, country, axs[2])
     return axs
     
 def plot_groups(
