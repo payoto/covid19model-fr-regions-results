@@ -110,12 +110,12 @@ class Model_Folder(object):
                 self.data[file] = pd.read_csv(self.files[file])
             data_categories = [file for file in self.files]
 
-        elif isinstance(data_category, list()):
+        elif isinstance(data_category, type(list())):
             for file in data_category:
                 self.data[file] = pd.read_csv(self.files[file])
             data_categories = data_category
 
-        elif isinstance(data_category, str()):
+        elif isinstance(data_category, type(str())):
             self.data[data_category] = pd.read_csv(self.files[data_category])
             data_categories = [data_category]
 
