@@ -1,0 +1,10 @@
+name: covid19model-analysis
+dependencies:
+  - python>=3.7
+  - pandas
+  - geopandas
+  - numpy
+  - matplotlib
+  - descartes
+  - jupyter
+  - pip

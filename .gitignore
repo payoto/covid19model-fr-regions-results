@@ -2,3 +2,7 @@
 runs/archive/*
 *.pyc
 *-checkpoint.ipynb
+*.zip
+data/code-postal*
+data/ref-countries-2016*
+data/processed/*
