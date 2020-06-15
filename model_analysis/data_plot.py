@@ -1083,7 +1083,7 @@ def plot_group(
 
 
 def plot_groups(
-    groups, country, prop_cycle, cond_group=lambda x: True,
+    groups, country, prop_cycle=None, cond_group=lambda x: True,
     min_date='2020-02-10', max_date='2020-06-15',
     verbose=True,
     group_str_format=None,

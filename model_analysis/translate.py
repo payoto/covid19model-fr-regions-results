@@ -1,5 +1,11 @@
 import locale
-import pylcs
+try:
+    import pylcs
+    _is_def_lcs =  True
+except:
+    _is_def_lcs =  False
+    
+
 import numpy as np
 # locale.setlocale(locale.LC_ALL, "")
 
@@ -57,7 +63,8 @@ def translate_axes_to_french(axs):
 def  most_probable_match(string, possible_strings, n_matches=1):
     """ Fuzzy lookup for a similar string
     """
-
+    if not _is_def_lcs:
+        raise ImportError("`pylcs` not loaded try running 'pip install pylcs'")
     def return_match(arg_most_prob, probable_match, i_match=1):
         print(
             f"\tMatch {i_match} of {n_matches} : "
