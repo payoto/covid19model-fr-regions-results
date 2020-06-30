@@ -8,3 +8,5 @@ dependencies:
   - descartes
   - jupyter
   - pip
+  - pip:
+    - pylcs
