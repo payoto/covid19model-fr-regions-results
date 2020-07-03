@@ -1,5 +1,7 @@
 # covid19model-fr-regions-results
 
+[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/payoto/covid19model-fr-regions-results/master)
+
 This dataset is a derivative work from the Imperial College Study 
 [Estimating the number of infections and the impact of nonpharmaceutical interventions (NPI) on COVID-19 in 11 European countries](https://www.imperial.ac.uk/mrc-global-infectious-disease-analysis/covid-19/report-13-europe-npi-impact/).
 This repository presents results for the forecasting of the COVID-19 epidemic at French regional level.
